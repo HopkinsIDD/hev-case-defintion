@@ -1,0 +1,240 @@
+---
+title: "BD combos 2"
+author: "Aybuke Koyuncu"
+date: "2025-05-27"
+output: html_document
+---
+
+At least TWO symptoms. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Loading packages 
+# library(pacman)
+library(here)
+library(gtsummary)
+library(knitr)
+library(cowplot)
+library(ggridges)
+library(bayesplot)
+library(icenReg)
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(SuperLearner)
+library(ROCR)
+library(ggplot2)
+library(readr)
+library(janitor)
+library(dplyr)
+library(readxl)
+library(tidyr)
+library(ranger)
+library(kernlab)
+library(xgboost)
+library(ResourceSelection)
+library(pROC)
+
+# Datasets restricted to 30 days post jaundice onset
+dat_bd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_bd_adjusted.rds")
+
+# Remove the demographics
+dat_bd_symp <- dat_bd_symp %>% select(-age, -sex, -days_since_ajs)
+```
+
+
+```{r combo}
+
+# Define symptom variables
+symptom_names <- c(
+  "fever_ever", "nausea_ever", "vomit_ever", "appetite_ever",
+  "abdomen_ever", "diarrhea_ever", "constipate_ever", "melaena_ever", "head_ever", "convulsion_ever", "unconsc_ever", "drowsy_ever", "mental_ever", "exam_liver_palp", "exam_dehydrate",
+  "exam_oedema", "exam_dist_abdomen"
+)
+
+# Generate all subsets of symptoms (case definitions)
+case_definitions <- lapply(1:length(symptom_names), function(k) {
+  combn(symptom_names, k, simplify = FALSE)
+}) |> unlist(recursive = FALSE)
+
+# Remove just 1 symptom
+case_definitions <- case_definitions[-(1:9)]
+
+# Set batching parameters
+total_defs <- length(case_definitions)
+batch_size <- 500
+num_batches <- ceiling(total_defs / batch_size)
+
+library(future)
+library(furrr)
+library(purrr)
+
+plan(multicore)  # Or multicore on Linux/Mac
+
+# Loop over batches
+for (batch in 1:num_batches) {
+  start_i <- (batch - 1) * batch_size + 1
+  end_i <- min(batch * batch_size, total_defs)
+
+  message("Processing batch ", batch, " (", start_i, " to ", end_i, ")")
+
+  # Parallel + vectorized case def creation
+  batch_case_defs <- future_map(start_i:end_i, function(i) {
+    case_def <- case_definitions[[i]]
+    case_def_name <- paste0("case_def", i)
+
+    result <- rowSums(dat_bd_symp[, case_def, drop = FALSE] == 1, na.rm = TRUE) >= 2
+    setNames(list(as.integer(result)), case_def_name)
+  }) |> purrr::reduce(c)
+
+  # Convert to data frame
+  batch_df <- as.data.frame(batch_case_defs)
+
+  # Save the batch
+  saveRDS(batch_df, file = paste0("case_def2_batch_bd", batch, ".rds"))
+}
+
+
+# Start with the original data
+final_df <- dat_bd_symp
+
+# Append each batch of case definitions
+for (batch in 1:num_batches) {
+  path <- here("scripts", "Case_definitions", "BD batches", paste0("case_def2_batch_bd", batch, ".rds"))
+  batch_df <- readRDS(path)
+  final_df <- cbind(final_df, batch_df)
+}
+
+saveRDS(final_df , file = "dat_bd_symp_or_combos2.rds")
+
+
+```
+
+Now estimate the sensitivity and specificty of each combination of symptoms (i.e. each case definition)
+
+```{r sens_spec}
+
+dat_bd_symp <- final_df
+
+# Get combination column names
+case_def_cols <- (grep("^case_def", names(dat_bd_symp), value = TRUE))
+
+# Initialize an empty list to store results
+results_list <- list()
+
+# Helper function for safe CI calculation
+safe_prop_ci <- function(x, n) {
+  if (n > 0) {
+    ci <- prop.test(x, n, conf.level = 0.95, correct = FALSE)
+    list(est = x / n, lower = ci$conf.int[1], upper = ci$conf.int[2])
+  } else {
+    list(est = NA, lower = NA, upper = NA)
+  }
+}
+
+# Loop through each case definition
+for (case_col in case_def_cols) {
+  # Calculate confusion matrix components
+  tp <- sum(dat_bd_symp[[case_col]] == 1 & dat_bd_symp$infect_bin == 1)
+  fp <- sum(dat_bd_symp[[case_col]] == 1 & dat_bd_symp$infect_bin == 0)
+  tn <- sum(dat_bd_symp[[case_col]] == 0 & dat_bd_symp$infect_bin == 0)
+  fn <- sum(dat_bd_symp[[case_col]] == 0 & dat_bd_symp$infect_bin == 1)
+
+  # Compute statistics and CIs
+  sens <- safe_prop_ci(tp, tp + fn)
+  spec <- safe_prop_ci(tn, tn + fp)
+  ppv  <- safe_prop_ci(tp, tp + fp)
+  npv  <- safe_prop_ci(tn, tn + fn)
+
+  # Assemble results for this case definition
+  ci_df <- data.frame(
+    case_def = case_col,
+    sensitivity = sens$est,
+    sensitivity_lower = sens$lower,
+    sensitivity_upper = sens$upper,
+    specificity = spec$est,
+    specificity_lower = spec$lower,
+    specificity_upper = spec$upper,
+    ppv = ppv$est,
+    ppv_lower = ppv$lower,
+    ppv_upper = ppv$upper,
+    npv = npv$est,
+    npv_lower = npv$lower,
+    npv_upper = npv$upper
+  )
+  
+  # Store result
+  results_list[[case_col]] <- ci_df
+}
+
+
+# Combine into one dataframe
+results_df <- bind_rows(results_list)
+
+# Save it since it takes so long to process, won't need to run it again
+saveRDS(results_df, file = "bd_final_results_or_combos2.rds")
+
+# Look up case def # in case_definitions to see which sypmtom combos it corresponds to
+
+# Determine which case definitions are informative
+results_df <- results_df %>% mutate(inform=case_when(
+  sensitivity + specificity > 1 ~ 1,
+  TRUE ~ 0))
+
+# Among informative case defs, which ones had sens/spec above
+informative <- results_df %>% filter(inform==1)
+summary(informative$sensitivity)
+summary(informative$specificity)
+
+informative_sub <- informative %>% filter(sensitivity>0.50 & specificity>0.5)
+
+# None
+# informative_sub <- informative %>% filter(sensitivity>0.60 & specificity>0.6)
+# informative_sub <- informative %>% filter(sensitivity>0.70 & specificity>0.7)
+
+# Top 5 informative with highest sens?
+metrics_sens_top <- informative_sub %>% arrange(desc(sensitivity))
+
+# Top 5 informative with highest spec?
+metrics_spec_top <- informative_sub  %>% arrange(desc(specificity)) 
+                               
+case_definitions[[15513]]
+```
+
+Can we create a metric of sens lost vs spec gained?
+
+```{r metric}
+informative <- informative %>% mutate(metric=(1-sensitivity)/specificity)
+informative_sub <- informative_sub %>% mutate(metric=(1-sensitivity)/specificity)
+
+# A higher ratio means 
+test <- informative %>% select(sensitivity, specificity, metric) %>% arrange(metric)
+
+full_plot <- ggplot(informative, aes(x = sensitivity, y = specificity, color = metric)) +
+  geom_point(size = 3) +
+scale_color_viridis_c(limits = c(0, 1)) + theme_minimal() + annotate("rect",
+           xmin = 0.5, xmax = 1,
+           ymin = 0.5, ymax = 1,
+           alpha = 0.1,
+           fill = NA,
+           color = "black",
+           linetype = "dashed") 
+
+subset_plot <- ggplot(informative_sub, aes(x = sensitivity, y = specificity, color = metric)) +
+  geom_point(size = 3) +
+scale_color_viridis_c(limits = c(0, 1)) +
+  theme_minimal() 
+
+
+```
+
+Get the 2x2 table for the top performing case def. Chose 8628 because it has same spec, same number of symptoms, but higher sens 
+
+```{r 2x2}
+
+
+tabyl(dat_bd_symp$case_def15513)
+tabyl(dat_bd_symp, case_def15513, infect_bin)
+
+```

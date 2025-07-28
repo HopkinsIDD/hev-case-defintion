@@ -1,0 +1,470 @@
+---
+title: "BD_Ensemble models_elisa_only"
+author: "Aybuke Koyuncu"
+date: "2025-04-09"
+output: html_document
+---
+
+Repeating the ensemble learning models in Bangladesh but defining infected as ELISA+ only and keeping observations missing PCR. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Loading packages 
+# library(pacman)
+library(here)
+library(gtsummary)
+library(knitr)
+library(cowplot)
+library(ggridges)
+library(bayesplot)
+library(icenReg)
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(SuperLearner)
+library(ROCR)
+library(ggplot2)
+library(readr)
+library(janitor)
+library(dplyr)
+library(readxl)
+library(tidyr)
+library(ranger)
+library(kernlab)
+library(xgboost)
+library(ResourceSelection)
+library(pROC)
+
+# Symptoms and demographcis: 30 days post jaundice onset
+dat_bd_adjusted <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_bd_adjusted.rds")
+
+# Symptoms only: 30 days post jaundice onset
+dat_bd_symp <- dat_bd_adjusted %>% select(-sex, -age, -days_since_ajs) 
+
+# Symptoms and demographcis: 14 days post jaundice onset
+dat_bd_adjusted_short <- dat_bd_adjusted %>% filter(days_since_ajs<=14) 
+
+# Symptoms only: 14 days post jaundice onset
+dat_bd_symp_short <- dat_bd_adjusted_short %>% select(-sex, -age, -days_since_ajs) 
+
+```
+
+Try running ensemble learning models using the SuperLearner package only using self-reported symptoms:
+
+```{r loocv}
+
+set.seed(12345)
+
+# Define the full dataset (not just a training subset)
+X_full <- dat_bd_symp %>% select(-infect_bin)  # Predictors
+Y_full <- dat_bd_symp$infect_bin               # Outcome variable
+
+# Store predictions
+n <- nrow(X_full)
+loocv_preds <- rep(NA, n)
+
+# Loop over each observation
+for (i in 1:n) {
+  cat("Fitting LOOCV model", i, "of", n, "\n")
+  
+  # Leave out the i-th observation
+  X_train <- X_full[-i, , drop = FALSE]
+  Y_train <- Y_full[-i]
+  
+  X_test <- X_full[i, , drop = FALSE]
+  
+  # Fit the model on the remaining data
+  model_loocv <- SuperLearner(
+    Y = Y_train,
+    X = X_train,
+    family = binomial(),
+    SL.library = list("SL.ranger", # random forest
+                      "SL.gam", # generalized additive model
+                      "SL.xgboost", # extreme gradient boosting
+                      "SL.glmnet"))
+  
+  # Predict on the left-out observation
+  pred <- predict(model_loocv, newdata = X_test)$pred
+  loocv_preds[i] <- pred
+}
+
+# Calculate AUC and 95% CI
+roc_obj <- roc(Y_full, loocv_preds)
+
+# AUC value
+auc_value <- auc(roc_obj)
+
+# 95% CI
+auc_ci <- ci.auc(roc_obj, method = "bootstrap", boot.n = 2000)
+
+# Print results
+cat(sprintf("LOOCV AUC: %.3f (95%% CI: %.3f–%.3f)\n",
+            auc_value, auc_ci[1], auc_ci[3]))
+
+
+# # Compute LOOCV AUC
+pred_rocr_loocv <- ROCR::prediction(loocv_preds, Y_full)
+auc_loocv <- ROCR::performance(pred_rocr_loocv, measure = "auc")@y.values[[1]]
+print(paste("LOOCV AUC:", round(auc_loocv, 3)))
+
+# Create ROC curve data
+roc_perf_loocv <- ROCR::performance(pred_rocr_loocv, measure = "tpr", x.measure = "fpr")
+roc_data_loocv <- data.frame(
+  fpr = unlist(roc_perf_loocv@x.values),
+  tpr = unlist(roc_perf_loocv@y.values)
+)
+
+# Plot 
+roc_curve_30_loocv <- ggplot(roc_data_loocv, aes(x = fpr, y = tpr)) +
+  geom_line(color = "orange", size = 1, alpha=0.8) + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") + 
+  labs(x = "1 - Specificity",
+       y = "Sensitivity") +
+  theme_minimal()
+
+```
+
+Now try repeating the above with age, sex, and days since jaundice onset incorporated.
+
+```{r loocv_adjusted}
+
+# Define the full dataset (not just a training subset)
+X_full_adjusted <- dat_bd_adjusted %>% select(-infect_bin)  # Predictors
+Y_full_adjusted <- dat_bd_adjusted$infect_bin               # Outcome variable
+
+# Store predictions
+n_adjusted <- nrow(X_full_adjusted)
+loocv_preds_adjusted <- rep(NA, n_adjusted)
+
+# Loop over each observation
+for (i in 1:n_adjusted) {
+  cat("Fitting LOOCV model", i, "of", n_adjusted, "\n")
+  
+  # Leave out the i-th observation
+  X_train <- X_full_adjusted[-i, , drop = FALSE]
+  Y_train <- Y_full_adjusted[-i]
+  
+  X_test <- X_full_adjusted[i, , drop = FALSE]
+  
+  # Fit the model on the remaining data
+  model_loocv <- SuperLearner(
+    Y = Y_train,
+    X = X_train,
+    family = binomial(),
+    SL.library = list("SL.ranger", "SL.xgboost", "SL.glmnet", "SL.gam"))
+  
+  # Predict on the left-out observation
+  pred <- predict(model_loocv, newdata = X_test)$pred
+  loocv_preds_adjusted[i] <- pred
+}
+
+
+# Calculate AUC and 95% CI
+roc_obj_adjusted <- roc(Y_full_adjusted, loocv_preds_adjusted)
+
+# AUC value
+auc_value_adjusted <- auc(roc_obj_adjusted)
+
+# 95% CI
+auc_ci_adjusted <- ci.auc(roc_obj_adjusted, method = "bootstrap", boot.n = 2000)
+
+# Print results
+cat(sprintf("LOOCV AUC: %.3f (95%% CI: %.3f–%.3f)\n",
+            auc_value_adjusted, auc_ci_adjusted[1], auc_ci_adjusted[3]))
+
+# Compute LOOCV AUC
+pred_rocr_loocv_adjusted <- ROCR::prediction(loocv_preds_adjusted, Y_full_adjusted)
+auc_loocv_adjusted <- ROCR::performance(pred_rocr_loocv_adjusted, measure = "auc")@y.values[[1]]
+print(paste("LOOCV AUC:", round(auc_loocv_adjusted, 3)))
+
+# Create ROC curve data
+roc_perf_loocv_adjusted <- ROCR::performance(pred_rocr_loocv_adjusted, measure = "tpr", x.measure = "fpr")
+roc_data_loocv_adjusted <- data.frame(
+  fpr = unlist(roc_perf_loocv_adjusted@x.values),
+  tpr = unlist(roc_perf_loocv_adjusted@y.values)
+)
+
+# Plot 
+roc_curve_30_loocv_adjusted <- ggplot(roc_data_loocv_adjusted, aes(x = fpr, y = tpr)) +
+  geom_line(color = "orange", size = 1, alpha=0.8) + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") + 
+  labs(x = "1 - Specificity",
+       y = "Sensitivity") +
+  theme_minimal()
+
+```
+
+Now put both ROC curves in the same figure
+
+```{r roc}
+
+# Add a model type column to each data frame
+roc_data_loocv$model <- "Signs/symptoms"
+roc_data_loocv_adjusted$model <- "Signs/symptoms plus demographics"
+
+# Combine both data frames
+roc_combined <- rbind(roc_data_loocv, roc_data_loocv_adjusted)
+
+combined <- ggplot(roc_combined, aes(x = fpr, y = tpr, group = model)) +
+  geom_line(aes(alpha = model), color = "orange", size = 1) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +
+  scale_alpha_manual(values = c("Signs/symptoms" = 0.5,
+                                "Signs/symptoms plus demographics" = 1)) +
+  labs(x = "1 - Specificity",
+       y = "Sensitivity",
+       alpha = NULL) +  # Removes the legend title
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  ggtitle("B")
+
+combined
+```
+
+Now repeat both adjusted and unadjusted in subset of participants with AJS onset within 14 days of clinic visit.
+
+```{r loocv_short}
+
+# Define the full dataset (not just a training subset)
+X_full_short <- dat_bd_symp_short %>% select(-infect_bin)  # Predictors
+Y_full_short <- dat_bd_symp_short$infect_bin               # Outcome variable
+
+# Store predictions
+n_short <- nrow(X_full_short)
+loocv_preds_short <- rep(NA, n_short)
+
+# Loop over each observation
+for (i in 1:n_short) {
+  cat("Fitting LOOCV model", i, "of", n_short, "\n")
+  
+  # Leave out the i-th observation
+  X_train <- X_full_short[-i, , drop = FALSE]
+  Y_train <- Y_full_short[-i]
+  
+  X_test <- X_full_short[i, , drop = FALSE]
+  
+  # Fit the model on the remaining data
+  model_loocv <- SuperLearner(
+    Y = Y_train,
+    X = X_train,
+    family = binomial(),
+    SL.library = list("SL.ranger", # random forest
+                      "SL.gam", # generalized additive model
+                      "SL.xgboost", # extreme gradient boosting
+                      "SL.glmnet"))
+  
+  # Predict on the left-out observation
+  pred <- predict(model_loocv, newdata = X_test)$pred
+  loocv_preds_short[i] <- pred
+}
+
+
+# Calculate AUC and 95% CI
+roc_obj_short <- roc(Y_full_short, loocv_preds_short)
+
+# AUC value
+auc_value_short <- auc(roc_obj_short)
+
+# 95% CI
+auc_ci_short <- ci.auc(roc_obj_short , method = "bootstrap", boot.n = 2000)
+
+# Print results
+cat(sprintf("LOOCV AUC: %.3f (95%% CI: %.3f–%.3f)\n",
+            auc_value_short , auc_ci_short [1], auc_ci_short [3]))
+
+# Compute LOOCV AUC
+pred_rocr_loocv_short <- ROCR::prediction(loocv_preds_short, Y_full_short)
+auc_loocv_short <- ROCR::performance(pred_rocr_loocv_short, measure = "auc")@y.values[[1]]
+print(paste("LOOCV AUC:", round(auc_loocv_short, 3)))
+
+# Create ROC curve data
+roc_perf_loocv_short <- ROCR::performance(pred_rocr_loocv_short, measure = "tpr", x.measure = "fpr")
+roc_data_loocv_short <- data.frame(
+  fpr = unlist(roc_perf_loocv_short@x.values),
+  tpr = unlist(roc_perf_loocv_short@y.values)
+)
+
+# Plot 
+roc_curve_14_loocv <- ggplot(roc_data_loocv_short, aes(x = fpr, y = tpr)) +
+  geom_line(color = "orange", size = 1, alpha=0.8) + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") + 
+  labs(x = "1 - Specificity",
+       y = "Sensitivity") +
+  theme_minimal()
+
+```
+
+Now try repeating the above with age, sex, and days since jaundice onset incorporated.
+
+```{r loocv_adjusted_short}
+
+# Define the full dataset (not just a training subset)
+X_full_short_adjusted  <- dat_bd_adjusted_short %>% select(-infect_bin)  # Predictors
+Y_full_short_adjusted  <- dat_bd_adjusted_short $infect_bin               # Outcome variable
+
+# Store predictions
+n_short_adjusted <- nrow(X_full_short_adjusted)
+loocv_preds_short_adjusted <- rep(NA, n_short_adjusted)
+
+# Loop over each observation
+for (i in 1:n_short_adjusted) {
+  cat("Fitting LOOCV model", i, "of", n_short_adjusted, "\n")
+  
+  # Leave out the i-th observation
+  X_train <- X_full_short_adjusted[-i, , drop = FALSE]
+  Y_train <- Y_full_short_adjusted[-i]
+  
+  X_test <- X_full_short_adjusted[i, , drop = FALSE]
+  
+  # Fit the model on the remaining data
+  model_loocv <- SuperLearner(
+    Y = Y_train,
+    X = X_train,
+    family = binomial(),
+    SL.library = list("SL.ranger", # random forest
+                      "SL.gam", # generalized additive model
+                      "SL.xgboost", # extreme gradient boosting
+                      "SL.glmnet"))
+  
+  # Predict on the left-out observation
+  pred <- predict(model_loocv, newdata = X_test)$pred
+  loocv_preds_short_adjusted[i] <- pred
+}
+
+
+# Calculate AUC and 95% CI
+roc_obj_short_adjusted <- roc(Y_full_short_adjusted, loocv_preds_short_adjusted)
+
+# AUC value
+auc_value_short_adjusted <- auc(roc_obj_short_adjusted)
+
+# 95% CI
+auc_ci_short_adjusted <- ci.auc(roc_obj_short_adjusted, method = "bootstrap", boot.n = 2000)
+
+# Print results
+cat(sprintf("LOOCV AUC: %.3f (95%% CI: %.3f–%.3f)\n",
+            auc_value_short_adjusted , auc_ci_short_adjusted [1], auc_ci_short_adjusted [3]))
+
+
+# Compute LOOCV AUC
+pred_rocr_loocv_short_adjusted <- ROCR::prediction(loocv_preds_short_adjusted, Y_full_short_adjusted)
+auc_loocv_short_adjusted <- ROCR::performance(pred_rocr_loocv_short_adjusted, measure = "auc")@y.values[[1]]
+print(paste("LOOCV AUC:", round(auc_loocv_short_adjusted, 3)))
+
+# Create ROC curve data
+roc_perf_loocv_short_adjusted <- ROCR::performance(pred_rocr_loocv_short_adjusted, measure = "tpr", x.measure = "fpr")
+roc_data_loocv_short_adjusted <- data.frame(
+  fpr = unlist(roc_perf_loocv_short_adjusted@x.values),
+  tpr = unlist(roc_perf_loocv_short_adjusted@y.values)
+)
+
+# Plot 
+roc_curve_14_loocv_adjusted <- ggplot(roc_data_loocv_short_adjusted, aes(x = fpr, y = tpr)) +
+  geom_line(color = "orange", size = 1, alpha=0.8) + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") + 
+  labs(x = "1 - Specificity",
+       y = "Sensitivity") +
+  theme_minimal()
+
+```
+
+Now combine the ROC curves in the shorter careseeking
+
+```{r roc_short}
+
+# Add a model type column to each data frame
+roc_data_loocv_short$model <- "Signs/symptoms"
+roc_data_loocv_short_adjusted$model <- "Signs/symptoms plus demographics"
+
+# Combine both data frames
+roc_combined2 <- rbind(roc_data_loocv_short, roc_data_loocv_short_adjusted)
+
+# Plot both ROC curves in one plot with a legend
+combined2 <- ggplot(roc_combined2, aes(x = fpr, y = tpr, group = model)) +
+  geom_line(aes(alpha = model), color = "orange", size = 1) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black") +
+  scale_alpha_manual(values = c("Signs/symptoms" = 0.5,
+                                "Signs/symptoms plus demographics" = 1)) +
+  labs(x = "1 - Specificity",
+       y = "Sensitivity",
+       alpha = NULL) +  # Removes the legend title
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  ggtitle("B")
+
+```
+
+Evaluate the sens/spec of existing case definitions
+
+```{r case_def}
+
+########################
+# MSF case definitions #
+########################
+
+dat_bd_symp <- dat_bd_symp %>% mutate(msf_def = case_when(
+  drowsy_ever==1 | nausea_ever==1 | appetite_ever==1 ~ 1,
+  TRUE ~ 0))
+
+# Compare sensitivity to ELISA+
+tabyl(dat_bd_symp, msf_def, infect_bin)
+
+sens_msf <- 495 / (495 + 116)
+spec_msf <- 172 / (172 + 842)
+
+sens_msf_ci <- prop.test(495, 495 + 116, conf.level = 0.95, correct = FALSE)$conf.int
+spec_msf_ci <- prop.test(172, 172 + 842, conf.level = 0.95, correct = FALSE)$conf.int
+
+sens_msf
+sens_msf_ci
+
+spec_msf
+spec_msf_ci
+
+########################
+# WHO case definitions #
+########################
+
+dat_bd_symp <- dat_bd_symp %>% mutate(who_def = case_when(
+  drowsy_ever==1 | fever_ever==1 ~ 1,
+  TRUE ~ 0))
+
+# Compare sensitivity to ELISA+
+tabyl(dat_bd_symp, who_def, infect_bin)
+
+sens_who <- 326 / (326 + 285)
+spec_who <- 410 / (410 + 604)
+
+sens_who_ci <- prop.test(326, 326 + 285, conf.level = 0.95, correct = FALSE)$conf.int
+spec_who_ci <- prop.test(410, 410 + 604, conf.level = 0.95, correct = FALSE)$conf.int
+
+sens_who
+sens_who_ci
+
+spec_who
+spec_who_ci
+
+########################
+# IMC case definitions #
+########################
+
+dat_bd_symp <- dat_bd_symp %>% mutate(imc_def = case_when(
+  drowsy_ever==1 | appetite_ever==1 | fever_ever==1 | abdomen_ever==1  ~ 1,
+  TRUE ~ 0))
+
+# Compare sensitivity to ELISA+
+tabyl(dat_bd_symp, imc_def, infect_bin)
+
+sens_imc <- 507 / (507 + 104)
+spec_imc <- 148 / (148 + 866)
+
+sens_imc_ci <- prop.test(507, 507 + 104, conf.level = 0.95, correct = FALSE)$conf.int
+spec_imc_ci <- prop.test(148, 148 + 866, conf.level = 0.95, correct = FALSE)$conf.int
+
+sens_imc
+sens_imc_ci
+
+spec_imc
+spec_imc_ci
+
+```

@@ -1,0 +1,197 @@
+---
+title: "SSD combos_at least 2"
+author: "Aybuke Koyuncu"
+date: "2025-05-27"
+output: html_document
+---
+This code is for running case definitions that have AT LEAST TWO symptoms.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Loading packages 
+# library(pacman)
+library(here)
+library(gtsummary)
+library(knitr)
+library(cowplot)
+library(ggridges)
+library(icenReg)
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(ggplot2)
+library(tidyr)
+library(janitor)
+library(binom)
+
+# Datasets restricted to 30 days post jaundice onset
+dat_ssd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_ssd_adjusted.rds")
+
+# Keep bleeding, itch, convulsion in this analysis. Want all signs/symptoms, regardless of prevalence
+
+# Remove demographics
+dat_ssd_symp <- dat_ssd_symp %>% select(-days_since_ajs_baseline, -id_sex, -age)
+```
+
+```{r combo}
+
+# List of symptom names
+symptom_names <- c(
+  "vomiting","mental", "fever", "abdomen_pain", "cough", "head",
+  "epigastric_pain", "fatigue", "loss_appetite", "joint_pains",
+  "diarrhea", "nausea", "itch", "convulsion", "bleeding"
+)
+
+# Generate all subsets of symptoms (case definitions)
+
+case_definitions <- lapply(1:length(symptom_names), function(k) {
+  combn(symptom_names, k, simplify = FALSE)
+}) |> unlist(recursive = FALSE)
+
+# Set batching parameters
+total_defs <- length(case_definitions)
+batch_size <- 500
+num_batches <- ceiling(total_defs / batch_size)
+
+library(future)
+library(furrr)
+library(purrr)
+
+plan(multicore)  # Or multicore on Linux/Mac
+
+# Loop over batches
+for (batch in 1:num_batches) {
+  start_i <- (batch - 1) * batch_size + 1
+  end_i <- min(batch * batch_size, total_defs)
+
+  message("Processing batch ", batch, " (", start_i, " to ", end_i, ")")
+
+  # Parallel + vectorized case def creation
+  batch_case_defs <- future_map(start_i:end_i, function(i) {
+    case_def <- case_definitions[[i]]
+    case_def_name <- paste0("case_def", i)
+
+    result <- rowSums(dat_ssd_symp[, case_def, drop = FALSE] == 1, na.rm = TRUE) >= 2
+    setNames(list(as.integer(result)), case_def_name)
+  }) |> purrr::reduce(c)
+
+  # Convert to data frame
+  batch_df <- as.data.frame(batch_case_defs)
+
+  # Save the batch
+  saveRDS(batch_df, file = paste0("case_def2_batch_ssd", batch, ".rds"))
+}
+
+# Start with the original data
+final_df <- dat_ssd_symp
+
+# Append each batch of case definitions
+for (batch in 1:num_batches) {
+  path <- here("scripts", "Case_definitions", "SSD batches", paste0("case_def2_batch_ssd", batch, ".rds"))
+  batch_df <- readRDS(path)
+  final_df <- cbind(final_df, batch_df)
+}
+
+```
+
+Now estimate the sensitivity and specificty of each combination of symptoms (i.e. each case definition)
+
+```{r sens_spec}
+
+dat_ssd_symp <- final_df
+
+# Get combination column names
+case_def_cols <- (grep("^case_def", names(dat_ssd_symp), value = TRUE))
+
+# Initialize an empty list to store results
+results_list <- list()
+
+# Helper function for safe CI calculation
+safe_prop_ci <- function(x, n) {
+  if (n > 0) {
+    ci <- prop.test(x, n, conf.level = 0.95, correct = FALSE)
+    list(est = x / n, lower = ci$conf.int[1], upper = ci$conf.int[2])
+  } else {
+    list(est = NA, lower = NA, upper = NA)
+  }
+}
+
+# Loop through each case definition
+for (case_col in case_def_cols) {
+  # Calculate confusion matrix components
+  tp <- sum(dat_ssd_symp[[case_col]] == 1 & dat_ssd_symp$infect_bin == 1)
+  fp <- sum(dat_ssd_symp[[case_col]] == 1 & dat_ssd_symp$infect_bin == 0)
+  tn <- sum(dat_ssd_symp[[case_col]] == 0 & dat_ssd_symp$infect_bin == 0)
+  fn <- sum(dat_ssd_symp[[case_col]] == 0 & dat_ssd_symp$infect_bin == 1)
+
+  # Compute statistics and CIs
+  sens <- safe_prop_ci(tp, tp + fn)
+  spec <- safe_prop_ci(tn, tn + fp)
+  ppv  <- safe_prop_ci(tp, tp + fp)
+  npv  <- safe_prop_ci(tn, tn + fn)
+
+  # Assemble results for this case definition
+  ci_df <- data.frame(
+    case_def = case_col,
+    sensitivity = sens$est,
+    sensitivity_lower = sens$lower,
+    sensitivity_upper = sens$upper,
+    specificity = spec$est,
+    specificity_lower = spec$lower,
+    specificity_upper = spec$upper,
+    ppv = ppv$est,
+    ppv_lower = ppv$lower,
+    ppv_upper = ppv$upper,
+    npv = npv$est,
+    npv_lower = npv$lower,
+    npv_upper = npv$upper
+  )
+  
+  # Store result
+  results_list[[case_col]] <- ci_df
+}
+
+# Combine into one dataframe
+results_df <- bind_rows(results_list)
+
+# Look up case def # in case_definitions to see which sypmtom combos it corresponds to
+
+# Determine which case definitions are informative
+results_df <- results_df %>% mutate(inform=case_when(
+  sensitivity + specificity > 1 ~ 1,
+  TRUE ~ 0))
+
+# Among informative case defs, which ones had sens/spec above
+informative <- results_df %>% filter(inform==1)
+summary(informative$sensitivity)
+summary(informative$specificity)
+
+# None
+informative_sub <- informative %>% filter(sensitivity>0.60 & specificity>0.6)
+# informative_sub <- informative %>% filter(sensitivity>0.70 & specificity>0.7)
+
+# Top 5 informative with highest sens?
+metrics_sens_top <- informative_sub %>% arrange(desc(sensitivity))
+
+# Top 5 informative with highest spec?
+metrics_spec_top <- informative_sub  %>% arrange(desc(specificity)) 
+
+case_definitions[[5774]]
+
+```
+
+Get the 2x2 table for the top performing case def: vomiting or fatigue
+
+```{r 2x2}
+
+tabyl(dat_ssd_symp$case_def5774)
+tabyl(dat_ssd_symp, case_def5774, infect_bin)
+
+# Try to create the case def on my own and make sure it matches. It does
+dat_ssd_symp$test <- as.integer(rowSums(dat_ssd_symp[, c("vomiting", "fever", "abdomen_pain", "fatigue", "nausea", "itch")], na.rm = TRUE) >= 2)
+
+tabyl(dat_ssd_symp$test)
+tabyl(dat_ssd_symp, test, infect_bin)
+```
+

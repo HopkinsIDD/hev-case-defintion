@@ -1,0 +1,280 @@
+---
+title: "Joint v2"
+author: "Aybuke Koyuncu"
+date: "2025-06-14"
+output: html_document
+---
+
+For at least TWO symptoms.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Loading packages 
+library(here)
+library(gtsummary)
+library(knitr)
+library(cowplot)
+library(ggridges)
+library(bayesplot)
+library(icenReg)
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(SuperLearner)
+library(ROCR)
+library(ggplot2)
+library(readr)
+library(janitor)
+library(dplyr)
+library(readxl)
+library(tidyr)
+library(ranger)
+library(kernlab)
+library(xgboost)
+
+# Load in each dataset
+dat_bd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_bd_adjusted.rds")
+
+# Remove demographics
+dat_bd_symp <- dat_bd_symp %>% select(-days_since_ajs, -sex, -age)
+
+# Datasets restricted to 30 days post jaundice onset
+dat_ssd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_ssd_adjusted.rds")
+
+# Remove demographics
+dat_ssd_symp <- dat_ssd_symp %>% select(-days_since_ajs_baseline, -id_sex, -age)
+
+```
+
+First remove symptoms that aren't in both datasets and align the variable names
+
+```{r cleaning}
+
+dat_ssd_symp <- dat_ssd_symp %>% rename(vomit_ever=vomiting,
+                                        mental_ever=mental,
+                                        fever_ever=fever,
+                                        abdomen_ever=abdomen_pain,
+                                        head_ever=head,
+                                        appetite_ever=loss_appetite,
+                                        diarrhea_ever=diarrhea,
+                                        nausea_ever=nausea,
+                                        drowsy_ever=fatigue)
+                      
+# Make sure everything 0/1
+dat_ssd_symp  <- dat_ssd_symp  %>% mutate(
+                                        vomit_ever=as.factor(ifelse(vomit_ever == "Yes", 1, 0)),
+                                        mental_ever=as.factor(ifelse(mental_ever == "Yes", 1, 0)),
+                                        fever_ever=as.factor(ifelse(fever_ever == "Yes", 1, 0)),
+                                        abdomen_ever=as.factor(ifelse(abdomen_ever == "Yes", 1, 0)),
+                                        head_ever=as.factor(ifelse(head_ever == "Yes", 1, 0)),
+                                        appetite_ever=as.factor(ifelse(appetite_ever == "Yes", 1, 0)),
+                                        diarrhea_ever=as.factor(ifelse(diarrhea_ever == "Yes", 1, 0)),
+                                        nausea_ever=as.factor(ifelse(nausea_ever == "Yes", 1, 0)),
+                                        drowsy_ever=as.factor(ifelse(drowsy_ever == "Yes", 1, 0)))
+                      
+
+                      
+dat_ssd_symp <- dat_ssd_symp %>% select(infect_bin, vomit_ever, mental_ever, fever_ever, abdomen_ever, head_ever, appetite_ever, diarrhea_ever, nausea_ever, drowsy_ever) %>% mutate(dataset=1)
+
+dat_bd_symp <- dat_bd_symp %>% select(infect_bin, vomit_ever, mental_ever, fever_ever, abdomen_ever, head_ever, appetite_ever, diarrhea_ever, nausea_ever, drowsy_ever) %>% mutate(dataset=2)                    
+# Merge the datasets together
+dat <- dat_ssd_symp %>% full_join(dat_bd_symp)
+
+```
+
+```{r combo}
+
+# Define symptom variables
+symptom_names <- c(
+  "vomit_ever", "mental_ever", "fever_ever", "abdomen_ever", "head_ever", "appetite_ever", "diarrhea_ever", "nausea_ever", "drowsy_ever")
+
+# Generate all subsets of symptoms (case definitions)
+case_definitions <- lapply(1:length(symptom_names), function(k) {
+  combn(symptom_names, k, simplify = FALSE)
+}) |> unlist(recursive = FALSE)
+
+# Remove just 1 symptom
+case_definitions <- case_definitions[-(1:9)]
+
+# Set batching parameters
+total_defs <- length(case_definitions)
+batch_size <- 500
+num_batches <- ceiling(total_defs / batch_size)
+
+library(future)
+library(furrr)
+library(purrr)
+
+plan(multicore)  # Or multicore on Linux/Mac
+
+# Loop over batches
+for (batch in 1:num_batches) {
+  start_i <- (batch - 1) * batch_size + 1
+  end_i <- min(batch * batch_size, total_defs)
+
+  message("Processing batch ", batch, " (", start_i, " to ", end_i, ")")
+
+  # Parallel + vectorized case def creation
+  batch_case_defs <- future_map(start_i:end_i, function(i) {
+    case_def <- case_definitions[[i]]
+    case_def_name <- paste0("case_def", i)
+
+    result <- rowSums(dat[, case_def, drop = FALSE] == 1, na.rm = TRUE) >= 2
+    setNames(list(as.integer(result)), case_def_name)
+  }) |> purrr::reduce(c)
+
+  # Convert to data frame
+  batch_df <- as.data.frame(batch_case_defs)
+
+  # Save the batch
+  saveRDS(batch_df, file = paste0("case_def2_batch_joined", batch, ".rds"))
+}
+
+# Start with the original data
+final_df <- dat
+
+# Append each batch of case definitions
+for (batch in 1:num_batches) {
+  path <- here("scripts", "Case_definitions", paste0("case_def2_batch_joined", batch, ".rds"))
+  batch_df <- readRDS(path)
+  final_df <- cbind(final_df, batch_df)
+}
+
+```
+
+Now estimate the sensitivity and specificty of each combination of symptoms (i.e. each case definition)
+
+```{r sens_spec}
+
+dat <- final_df
+
+n_ssd <- sum(dat$dataset == 1)
+n_bd <- sum(dat$dataset == 2)
+
+# Calculate total N
+total <- n_ssd + n_bd
+
+# Assign weights to give each dataset 50% total weight
+dat$weight <- ifelse(dat$dataset == 1,
+                     0.5 / n_ssd,
+                     0.5 / n_bd)
+
+# Get combination column names
+case_def_cols <- (grep("^case_def", names(dat), value = TRUE))
+
+# Initialize an empty list to store results
+results_list <- list()
+
+compute_metrics_weighted <- function(data, case_col) {
+  pos_case <- data[[case_col]] == 1
+  neg_case <- data[[case_col]] == 0
+  infected <- data$infect_bin == 1
+  uninfected <- data$infect_bin == 0
+
+  # Weighted counts
+  tp <- sum(data$weight * (pos_case & infected))
+  fp <- sum(data$weight * (pos_case & uninfected))
+  tn <- sum(data$weight * (neg_case & uninfected))
+  fn <- sum(data$weight * (neg_case & infected))
+
+  sens <- ifelse((tp + fn) == 0, NA, tp / (tp + fn))
+  spec <- ifelse((tn + fp) == 0, NA, tn / (tn + fp))
+  ppv  <- ifelse((tp + fp) == 0, NA, tp / (tp + fp))
+  npv  <- ifelse((tn + fn) == 0, NA, tn / (tn + fn))
+
+  return(c(sens = sens, spec = spec, ppv = ppv, npv = npv))
+}
+
+# Set bootstrap parameters
+n_boot <- 1000
+set.seed(123)
+
+case_def_cols <- grep("^case_def", names(dat), value = TRUE)
+results_list <- list()
+
+for (case_col in case_def_cols) {
+  message("Bootstrapping for ", case_col)
+
+  # Collect bootstrapped metrics
+  metrics_boot <- replicate(n_boot, {
+    boot_sample <- dat[sample(1:nrow(dat), replace = TRUE), ]
+    compute_metrics_weighted(boot_sample, case_col)
+  })
+
+  # Convert to data frame
+  metrics_boot_df <- as.data.frame(t(metrics_boot))
+
+  # Calculate point estimate on full data
+  point_est <- compute_metrics_weighted(dat, case_col)
+
+  # CI: 2.5 and 97.5 percentiles
+  ci_df <- data.frame(
+    case_def = case_col,
+    sensitivity = point_est["sens"],
+    sensitivity_lower = quantile(metrics_boot_df$sens, 0.025, na.rm = TRUE),
+    sensitivity_upper = quantile(metrics_boot_df$sens, 0.975, na.rm = TRUE),
+    specificity = point_est["spec"],
+    specificity_lower = quantile(metrics_boot_df$spec, 0.025, na.rm = TRUE),
+    specificity_upper = quantile(metrics_boot_df$spec, 0.975, na.rm = TRUE),
+    ppv = point_est["ppv"],
+    ppv_lower = quantile(metrics_boot_df$ppv, 0.025, na.rm = TRUE),
+    ppv_upper = quantile(metrics_boot_df$ppv, 0.975, na.rm = TRUE),
+    npv = point_est["npv"],
+    npv_lower = quantile(metrics_boot_df$npv, 0.025, na.rm = TRUE),
+    npv_upper = quantile(metrics_boot_df$npv, 0.975, na.rm = TRUE)
+  )
+
+  results_list[[case_col]] <- ci_df
+}
+
+# Combine all results
+results_df <- bind_rows(results_list)
+
+```
+
+```{r output}
+# Look up case def # in case_definitions to see which sypmtom combos it corresponds to
+
+# Determine which case definitions are informative
+results_df <- results_df %>% mutate(inform=case_when(
+  sensitivity + specificity > 1 ~ 1,
+  TRUE ~ 0))
+
+# Among informative case defs, which ones had sens/spec above
+informative <- results_df %>% filter(inform==1)
+
+informative_sub <- informative %>% filter(sensitivity>0.50 & specificity>0.5)
+
+# None
+# informative_sub <- informative %>% filter(sensitivity>0.60 & specificity>0.6)
+# informative_sub <- informative %>% filter(sensitivity>0.70 & specificity>0.7)
+
+# Top 5 informative with highest sens?
+# metrics_sens_top <- informative_sub %>% arrange(desc(sensitivity))
+
+# Top 5 informative with highest spec?
+metrics_spec_top <- informative_sub  %>% arrange(desc(specificity)) 
+
+case_definitions[[163]]
+tabyl(dat, case_def163, infect_bin)
+
+# Weighted 2x2 table?
+# Load survey package
+library(survey)
+
+# Rescale weights to sum to the total number of observations
+dat$weight_scaled <- dat$weight * nrow(dat)
+
+# Create survey design with scaled weights
+svy_design <- svydesign(ids = ~1, data = dat, weights = ~weight_scaled)
+
+# Get weighted counts
+svy_table <- svytable(~ case_def163 + infect_bin, design = svy_design)
+
+# View
+svy_table
+
+round(svy_table)
+
+```
