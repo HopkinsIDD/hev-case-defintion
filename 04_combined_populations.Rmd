@@ -1,0 +1,68 @@
+---
+title: "Combined South Sudan + Bangladesh analysis"
+output: html_document
+---
+
+Reproduces **Table S6** and **Figure S5**, plus the NPV quoted in the Discussion
+(acute jaundice plus abdominal pain or fatigue/malaise: 77%, 95% CI 74 to 80).
+
+Only symptoms collected in both populations are used. Post-stratification weights
+give each population 50% of the total weight. Weights sum to the total number of patients (2,046), so weighted 2x2 counts are in
+patient units. 95% CIs are percentile
+bootstrap intervals; resampling is done within each population so the weights stay
+fixed.
+
+```{r setup, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(ggplot2)
+source(here("R", "data.R"))
+source(here("R", "metrics.R"))
+source(here("R", "combos.R"))
+
+joint <- load_joint()
+count(joint, dataset, infect_bin)
+```
+
+```{r search}
+threshold <- 0.5
+joint_results <- lapply(c(at_least_1 = 1, at_least_2 = 2), function(k) {
+  evaluate_case_defs(joint, JOINT_SYMPTOMS, min_k = k, weights = joint$weight)
+})
+```
+
+## Table S6: top definitions by specificity
+
+```{r tableS6}
+set.seed(123)
+top <- lapply(names(joint_results), function(nm) {
+  k <- c(at_least_1 = 1, at_least_2 = 2)[[nm]]
+  best <- select_case_defs(joint_results[[nm]], threshold, n = 10)
+  ci <- bootstrap_case_defs(joint, JOINT_SYMPTOMS, k, best$id)
+  cbind(rule = nm, format_selected(left_join(best, ci, by = "id")))
+})
+top <- do.call(rbind, top)
+top
+```
+
+## Discussion: abdominal pain or fatigue/malaise
+
+```{r npv_example}
+example <- joint_results$at_least_1 %>% filter(case_def == "abdomen_ever + drowsy_ever")
+set.seed(123)
+example_ci <- bootstrap_case_defs(joint, JOINT_SYMPTOMS, 1, example$id)
+format_selected(left_join(example, example_ci, by = "id"))
+```
+
+## Figure S5
+
+```{r figS5, fig.width = 6, fig.height = 5}
+top1 <- select_case_defs(joint_results$at_least_1, threshold, n = 10)
+ggplot(top1, aes(specificity, sensitivity)) +
+  annotate("rect", xmin = 0.5, xmax = 0.6, ymin = 0.5, ymax = 0.6, fill = "mistyrose", alpha = 0.4) +
+  annotate("rect", xmin = 0.6, xmax = 0.7, ymin = 0.5, ymax = 0.6, fill = "aliceblue", alpha = 0.4) +
+  geom_point(size = 3) +
+  coord_cartesian(xlim = c(0.5, 0.7), ylim = c(0.5, 0.6)) +
+  labs(x = "Specificity", y = "Sensitivity") +
+  theme_minimal()
+```

@@ -1,0 +1,78 @@
+---
+title: "Alternative case definitions (exhaustive search)"
+output: html_document
+---
+
+Reproduces **Table 5** (aged 14 and over) and **Table S5** (children under 14, South
+Sudan). Every combination of signs/symptoms is evaluated as "acute jaundice and at
+least one" or "at least two" of the listed symptoms.
+
+**Selection rule.** Among informative definitions (sensitivity + specificity > 1)
+whose sensitivity and specificity both exceed a threshold, report the one with the
+highest specificity, breaking ties by sensitivity and then by fewest symptoms. The
+thresholds below are the ones used for the manuscript. Without a threshold, the
+highest-specificity informative definition is a single rare symptom such as itch,
+with about 4% sensitivity.
+
+```{r setup, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+source(here("R", "data.R"))
+source(here("R", "metrics.R"))
+source(here("R", "combos.R"))
+
+populations <- list(
+  `South Sudan` = list(dat = load_ssd(binary = TRUE), symptoms = SSD_SYMPTOMS),
+  `South Sudan children` = list(dat = load_ssd(children = TRUE, binary = TRUE), symptoms = SSD_SYMPTOMS),
+  Bangladesh = list(dat = load_bd(binary = TRUE), symptoms = BD_SYMPTOMS)
+)
+
+# Sensitivity/specificity thresholds used when selecting definitions
+thresholds <- tribble(
+  ~population,            ~min_k, ~threshold,
+  "South Sudan",               1,        0.6,
+  "South Sudan",               2,        0.6,
+  "South Sudan children",      1,        0.4,
+  "South Sudan children",      2,        0.5,
+  "Bangladesh",                1,        0.5,
+  "Bangladesh",                2,        0.5
+)
+```
+
+```{r search}
+results <- thresholds %>%
+  rowwise() %>%
+  mutate(all_defs = list(evaluate_case_defs(populations[[population]]$dat,
+                                            populations[[population]]$symptoms, min_k)),
+         n_defs = nrow(all_defs),
+         n_informative = sum(all_defs$informative)) %>%
+  ungroup()
+
+results %>% select(population, min_k, n_defs, n_informative)
+```
+
+## Table 5 and Table S5
+
+```{r selected}
+selected <- results %>%
+  rowwise() %>%
+  mutate(best = list(format_selected(add_wilson_ci(select_case_defs(all_defs, threshold))))) %>%
+  ungroup() %>%
+  select(population, min_k, threshold, best) %>%
+  tidyr::unnest(best) %>%
+  as.data.frame()
+selected
+```
+
+## Sensitivity/specificity of all informative definitions
+
+```{r plot, fig.width = 9, fig.height = 6}
+results %>%
+  rowwise() %>%
+  mutate(all_defs = list(filter(all_defs, informative))) %>%
+  tidyr::unnest(all_defs) %>%
+  ggplot2::ggplot(ggplot2::aes(specificity, sensitivity)) +
+  ggplot2::geom_point(alpha = 0.2, size = 0.6) +
+  ggplot2::facet_grid(paste("at least", min_k) ~ population) +
+  ggplot2::theme_minimal()
+```

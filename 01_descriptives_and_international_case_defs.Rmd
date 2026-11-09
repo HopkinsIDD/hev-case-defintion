@@ -1,0 +1,66 @@
+---
+title: "Descriptives and international case definitions"
+output: html_document
+---
+
+Reproduces the parts of **Table 3** that come from the analytic datasets, **Table 4**
+(international case definitions, patients aged 14 and over) and **Table S4** (children
+under 14 in South Sudan).
+
+```{r setup, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+source(here("R", "data.R"))
+source(here("R", "metrics.R"))
+
+ssd <- load_ssd(binary = TRUE)
+ssd_children <- load_ssd(children = TRUE, binary = TRUE)
+bd <- load_bd(binary = TRUE)
+```
+
+## Table 3: patient characteristics
+
+IgG, jaundice signs (yellow skin/eyes, dark urine, pale stools), hospitalisation and
+death are not in the analytic datasets, so those rows cannot be reproduced here.
+
+```{r table3}
+n_pct <- function(x) sprintf("%d (%.0f)", sum(x), 100 * mean(x))
+med_iqr <- function(x) sprintf("%.1f (%.1f, %.1f)", median(x), quantile(x, 0.25), quantile(x, 0.75))
+
+describe <- function(dat, female, age, days, symptoms) {
+  groups <- list(Overall = dat,
+                 `IgM negative` = dat[dat$infect_bin == 0, ],
+                 `IgM positive` = dat[dat$infect_bin == 1, ])
+  rows <- function(d) c(
+    N = nrow(d),
+    Female = n_pct(female(d)),
+    `Age, median (IQR)` = med_iqr(d[[age]]),
+    `14-19` = n_pct(d[[age]] < 20),
+    `20-39` = n_pct(d[[age]] >= 20 & d[[age]] < 40),
+    `40-59` = n_pct(d[[age]] >= 40 & d[[age]] < 60),
+    `60+` = n_pct(d[[age]] >= 60),
+    `Days since jaundice onset, median (IQR)` = med_iqr(d[[days]]),
+    sapply(symptoms, function(s) n_pct(d[[s]] == 1))
+  )
+  as.data.frame(sapply(groups, rows))
+}
+
+describe(ssd, function(d) d$id_sex == "Female", "age", "days_since_ajs_baseline", SSD_SYMPTOMS)
+describe(bd, function(d) d$sex == "2", "age", "days_since_ajs", BD_SYMPTOMS)
+```
+
+## Table 4: international case definitions (aged 14 and over)
+
+Acute jaundice alone is met by everyone (sensitivity 100%, specificity 0%).
+CIs are Wilson score intervals.
+
+```{r table4}
+international_table(ssd, INTERNATIONAL_DEFS$ssd)
+international_table(bd, INTERNATIONAL_DEFS$bd)
+```
+
+## Table S4: international case definitions (children under 14, South Sudan)
+
+```{r tableS4}
+international_table(ssd_children, INTERNATIONAL_DEFS$ssd)
+```

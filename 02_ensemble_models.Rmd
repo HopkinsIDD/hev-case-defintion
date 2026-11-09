@@ -1,0 +1,72 @@
+---
+title: "Ensemble models (upper bound on discrimination)"
+output: html_document
+params:
+  cores: 1
+---
+
+Reproduces **Figure 1** (jaundice onset within 30 days), **Figure S2** (within 14 days)
+and **Figure S4** (children under 14, South Sudan), and the AUCs quoted in the Results.
+
+**Runtime:** each model refits the ensemble once per patient. With `cores = 1` this
+takes several hours (most of it Bangladesh, n = 1,625). To run faster, knit with
+`rmarkdown::render("02_ensemble_models.Rmd", params = list(cores = 8))`; results then
+differ slightly in the third decimal place from the sequential run (see `R/ensemble.R`).
+
+Not reproduced here: Figure S3 (Bangladesh symptoms on the day of admission), because
+that variable is not in the analytic dataset.
+
+```{r setup, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(cowplot)
+source(here("R", "data.R"))
+source(here("R", "ensemble.R"))
+
+ssd <- load_ssd() %>% select(-all_of(SSD_RARE_SYMPTOMS))
+ssd_children <- load_ssd(children = TRUE) %>% select(-all_of(SSD_RARE_SYMPTOMS))
+bd <- load_bd()
+```
+
+## South Sudan
+
+```{r ssd}
+set.seed(1234)
+ssd_30 <- run_ensembles(ssd, SSD_DEMOGRAPHICS, "South Sudan, <=30 days", params$cores)
+ssd_14 <- run_ensembles(filter(ssd, days_since_ajs_baseline <= 14), SSD_DEMOGRAPHICS,
+                        "South Sudan, <=14 days", params$cores)
+```
+
+## Bangladesh
+
+```{r bd}
+set.seed(12345)
+bd_30 <- run_ensembles(bd, BD_DEMOGRAPHICS, "Bangladesh, <=30 days", params$cores)
+bd_14 <- run_ensembles(filter(bd, days_since_ajs <= 14), BD_DEMOGRAPHICS,
+                       "Bangladesh, <=14 days", params$cores)
+```
+
+## Children under 14 (South Sudan)
+
+```{r children}
+set.seed(1234)
+ssd_kids <- run_ensembles(ssd_children, SSD_DEMOGRAPHICS, "South Sudan children", params$cores)
+```
+
+## AUCs
+
+```{r auc}
+aucs <- bind_rows(ssd_30$auc, bd_30$auc, ssd_14$auc, bd_14$auc, ssd_kids$auc)
+aucs %>% mutate(across(c(auc, lower, upper), ~ round(., 2)))
+```
+
+## Figures
+
+```{r figures, fig.width = 10, fig.height = 5}
+# Figure 1
+plot_grid(plot_roc(ssd_30$roc, "red", "A"), plot_roc(bd_30$roc, "orange", "B"))
+# Figure S2
+plot_grid(plot_roc(ssd_14$roc, "red", "A"), plot_roc(bd_14$roc, "orange", "B"))
+# Figure S4
+plot_roc(ssd_kids$roc, "red")
+```
