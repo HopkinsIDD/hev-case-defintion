@@ -56,13 +56,29 @@ format_selected(left_join(example, example_ci, by = "id"))
 
 ## Figure S5
 
-```{r figS5, fig.width = 6, fig.height = 5}
-top1 <- select_case_defs(joint_results$at_least_1, threshold, n = 10)
-ggplot(top1, aes(specificity, sensitivity)) +
-  annotate("rect", xmin = 0.5, xmax = 0.6, ymin = 0.5, ymax = 0.6, fill = "mistyrose", alpha = 0.4) +
-  annotate("rect", xmin = 0.6, xmax = 0.7, ymin = 0.5, ymax = 0.6, fill = "aliceblue", alpha = 0.4) +
+The published figure shades specificity < 0.6 as "< WHO, IMC". In this combined dataset
+the international definitions have specificity of 36% (MSF), 26% (WHO) and 11% (IMC),
+so every plotted definition is more specific than all three. The shading is omitted
+here; the reference values are printed instead.
+
+```{r figS5, fig.width = 7, fig.height = 5}
+international_spec <- sapply(INTERNATIONAL_DEFS$bd, function(s) {
+  meets <- rowSums(joint[s]) >= 1
+  sum(joint$weight * (!meets & joint$infect_bin == 0)) / sum(joint$weight * (joint$infect_bin == 0))
+})
+round(international_spec, 2)
+
+abbrev <- c(abdomen_ever = "A", drowsy_ever = "F", head_ever = "H", mental_ever = "M",
+            nausea_ever = "N", vomit_ever = "V", appetite_ever = "L", fever_ever = "Fe",
+            diarrhea_ever = "D")
+top1 <- select_case_defs(joint_results$at_least_1, threshold, n = 10) %>%
+  mutate(label = vapply(strsplit(case_def, " + ", fixed = TRUE),
+                        function(s) paste(sort(abbrev[s]), collapse = "|"), ""))
+ggplot(top1, aes(specificity, sensitivity, label = label)) +
   geom_point(size = 3) +
+  geom_text(hjust = -0.25, size = 3.5) +
   coord_cartesian(xlim = c(0.5, 0.7), ylim = c(0.5, 0.6)) +
-  labs(x = "Specificity", y = "Sensitivity") +
+  labs(x = "Specificity", y = "Sensitivity",
+       caption = "A abdominal pain, F fatigue/malaise, H headache, M mental status, N nausea, V vomiting") +
   theme_minimal()
 ```

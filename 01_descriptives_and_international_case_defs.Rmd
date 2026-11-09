@@ -3,9 +3,9 @@ title: "Descriptives and international case definitions"
 output: html_document
 ---
 
-Reproduces the parts of **Table 3** that come from the analytic datasets, **Table 4**
-(international case definitions, patients aged 14 and over) and **Table S4** (children
-under 14 in South Sudan).
+Reproduces the parts of **Table 3**, **Table S2** and **Table S3** that come from the
+analytic datasets, **Figure S1**, **Table 4** (international case definitions, patients
+aged 14 and over) and **Table S4** (children under 14 in South Sudan).
 
 ```{r setup, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -27,26 +27,76 @@ death are not in the analytic datasets, so those rows cannot be reproduced here.
 n_pct <- function(x) sprintf("%d (%.0f)", sum(x), 100 * mean(x))
 med_iqr <- function(x) sprintf("%.1f (%.1f, %.1f)", median(x), quantile(x, 0.25), quantile(x, 0.75))
 
-describe <- function(dat, female, age, days, symptoms) {
+#' @param age_breaks named lower bounds of the age bands (in years)
+describe <- function(dat, female, age, days, symptoms,
+                     age_breaks = c(`14-19` = 14, `20-39` = 20, `40-59` = 40, `60+` = 60)) {
   groups <- list(Overall = dat,
                  `IgM negative` = dat[dat$infect_bin == 0, ],
                  `IgM positive` = dat[dat$infect_bin == 1, ])
-  rows <- function(d) c(
-    N = nrow(d),
-    Female = n_pct(female(d)),
-    `Age, median (IQR)` = med_iqr(d[[age]]),
-    `14-19` = n_pct(d[[age]] < 20),
-    `20-39` = n_pct(d[[age]] >= 20 & d[[age]] < 40),
-    `40-59` = n_pct(d[[age]] >= 40 & d[[age]] < 60),
-    `60+` = n_pct(d[[age]] >= 60),
-    `Days since jaundice onset, median (IQR)` = med_iqr(d[[days]]),
-    sapply(symptoms, function(s) n_pct(d[[s]] == 1))
-  )
+  rows <- function(d) {
+    band <- cut(d[[age]], c(age_breaks, Inf), labels = names(age_breaks), right = FALSE)
+    delay <- cut(d[[days]], c(-Inf, 7, 14, Inf),
+                 labels = c("<1 week", ">1 week to 2 weeks", ">2 weeks to 1 month"))
+    c(N = nrow(d),
+      Female = n_pct(female(d)),
+      `Age, median (IQR)` = med_iqr(d[[age]]),
+      sapply(levels(band), function(b) n_pct(band == b)),
+      `Days since jaundice onset, median (IQR)` = med_iqr(d[[days]]),
+      sapply(levels(delay), function(b) n_pct(delay == b)),
+      sapply(symptoms, function(s) n_pct(d[[s]] == 1)))
+  }
   as.data.frame(sapply(groups, rows))
 }
 
 describe(ssd, function(d) d$id_sex == "Female", "age", "days_since_ajs_baseline", SSD_SYMPTOMS)
 describe(bd, function(d) d$sex == "2", "age", "days_since_ajs", BD_SYMPTOMS)
+```
+
+## Table S3: children under 14 (South Sudan)
+
+```{r tableS3}
+describe(ssd_children, function(d) d$id_sex == "Female", "age", "days_since_ajs_baseline",
+         SSD_SYMPTOMS, age_breaks = c(`0-4` = 0, `5-10` = 5, `11-13` = 11))
+```
+
+## Table S2: symptoms by delay between jaundice onset and visit
+
+The hospitalised South Sudan subset (SSD\*) is not in the analytic dataset.
+
+```{r tableS2}
+delay_band <- function(days) cut(days, c(-Inf, 7, 14, Inf),
+                                 labels = c("<1 week", ">1 to 2 weeks", ">2 weeks to 1 month"))
+shared <- c(Fever = "fever_ever", `Loss of appetite` = "appetite_ever", Nausea = "nausea_ever",
+            Diarrhea = "diarrhea_ever", Vomiting = "vomit_ever", Headache = "head_ever",
+            `Abdominal pain` = "abdomen_ever", `Altered mental state` = "mental_ever",
+            `Fatigue/drowsiness` = "drowsy_ever", Convulsion = "convulsion_ever")
+ssd_names <- c(SSD_TO_JOINT, convulsion_ever = "convulsion")   # BD name -> SSD name
+pct_by_delay <- function(dat, days, cols) {
+  band <- delay_band(dat[[days]])
+  t(sapply(cols, function(s) sprintf("%.0f%%", 100 * tapply(dat[[s]], band, mean))))
+}
+ssd_tab <- pct_by_delay(ssd, "days_since_ajs_baseline", setNames(ssd_names[shared], names(shared)))
+bd_tab <- pct_by_delay(bd, "days_since_ajs", shared)
+colnames(ssd_tab) <- paste("SSD", levels(delay_band(0)))
+colnames(bd_tab) <- paste("BD", levels(delay_band(0)))
+cbind(ssd_tab, bd_tab)[, c(1, 4, 2, 5, 3, 6)]
+```
+
+## Figure S1: days from jaundice onset to visit
+
+```{r figS1, fig.width = 9, fig.height = 4}
+library(ggplot2)
+bind_rows(
+  tibble(country = "South Sudan", days = ssd$days_since_ajs_baseline),
+  tibble(country = "Bangladesh", days = bd$days_since_ajs)
+) %>%
+  count(country, days) %>%
+  ggplot(aes(factor(days, levels = 0:30), n, fill = country)) +
+  geom_col(position = position_dodge(preserve = "single")) +
+  scale_fill_manual(values = c(Bangladesh = "orange", `South Sudan` = "red")) +
+  scale_x_discrete(drop = FALSE) +
+  labs(x = "Days since AJS onset", y = "Number of cases", fill = NULL) +
+  theme_minimal()
 ```
 
 ## Table 4: international case definitions (aged 14 and over)

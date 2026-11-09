@@ -11,7 +11,7 @@ R/
   metrics.R    sensitivity/specificity/PPV/NPV with Wilson CIs; international case definitions
   combos.R     evaluate every symptom combination; selection rule; weighted bootstrap
   ensemble.R   SuperLearner leave-one-out AUCs and ROC plots
-01_descriptives_and_international_case_defs.Rmd   Table 3 (partial), Table 4, Table S4
+01_descriptives_and_international_case_defs.Rmd   Tables 3, S2, S3 (data-derived rows), Figure S1, Tables 4, S4
 02_ensemble_models.Rmd                            Figure 1, Figure S2, Figure S4 and their AUCs
 03_alternative_case_definitions.Rmd               Table 5, Table S5
 04_combined_populations.Rmd                       Table S6, Figure S5, Discussion NPV
