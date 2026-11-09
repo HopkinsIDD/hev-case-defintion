@@ -26,12 +26,17 @@ library(janitor)
 library(binom)
 
 # Datasets restricted to 30 days post jaundice onset
-dat_ssd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_ssd_adjusted.rds")
+dat_ssd_symp <- readRDS(here("dat_ssd_adjusted.rds"))
 
 # Keep bleeding, itch, convulsion in this analysis. Want all signs/symptoms, regardless of prevalence
 
 # Remove demographics
 dat_ssd_symp <- dat_ssd_symp %>% select(-days_since_ajs_baseline, -id_sex, -age)
+
+# Symptoms are stored as "Yes"/"No" factors; recode to 0/1 integers so the
+# `== 1` comparisons used to build case definitions work as intended
+dat_ssd_symp <- dat_ssd_symp %>%
+  mutate(across(-infect_bin, ~ as.integer(. == "Yes")))
 ```
 
 ```{r combo}
@@ -53,6 +58,7 @@ case_definitions <- lapply(1:length(symptom_names), function(k) {
 total_defs <- length(case_definitions)
 batch_size <- 500
 num_batches <- ceiling(total_defs / batch_size)
+dir.create(here("batches"), showWarnings = FALSE)
 
 library(future)
 library(furrr)
@@ -80,7 +86,7 @@ for (batch in 1:num_batches) {
   batch_df <- as.data.frame(batch_case_defs)
 
   # Save the batch
-  saveRDS(batch_df, file = paste0("case_def2_batch_ssd", batch, ".rds"))
+  saveRDS(batch_df, file = here("batches", paste0("case_def2_batch_ssd", batch, ".rds")))
 }
 
 # Start with the original data
@@ -88,7 +94,7 @@ final_df <- dat_ssd_symp
 
 # Append each batch of case definitions
 for (batch in 1:num_batches) {
-  path <- here("scripts", "Case_definitions", "SSD batches", paste0("case_def2_batch_ssd", batch, ".rds"))
+  path <- here("batches", paste0("case_def2_batch_ssd", batch, ".rds"))
   batch_df <- readRDS(path)
   final_df <- cbind(final_df, batch_df)
 }

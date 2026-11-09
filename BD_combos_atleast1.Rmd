@@ -26,7 +26,6 @@ library(ROCR)
 library(ggplot2)
 library(readr)
 library(janitor)
-library(dplyr)
 library(readxl)
 library(tidyr)
 library(ranger)
@@ -36,7 +35,7 @@ library(ResourceSelection)
 library(pROC)
 
 # Datasets restricted to 30 days post jaundice onset
-dat_bd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_bd_adjusted.rds")
+dat_bd_symp <- readRDS(here("dat_bd_adjusted.rds"))
 
 # Remove the demographics
 dat_bd_symp <- dat_bd_symp %>% select(-age, -sex, -days_since_ajs)
@@ -62,6 +61,7 @@ case_definitions <- lapply(1:length(symptom_names), function(k) {
 total_defs <- length(case_definitions)
 batch_size <- 500
 num_batches <- ceiling(total_defs / batch_size)
+dir.create(here("batches"), showWarnings = FALSE)
 
 # Loop through batches
 for (batch in 1:num_batches) {
@@ -89,7 +89,7 @@ for (batch in 1:num_batches) {
 
   
   # Save this batch separately
-  saveRDS(batch_df, file = paste0("case_def_batch_bd", batch, ".rds"))
+  saveRDS(batch_df, file = here("batches", paste0("case_def_batch_bd", batch, ".rds")))
 }
 
 # Start with the original data
@@ -97,7 +97,7 @@ final_df <- dat_bd_symp
 
 # Append each batch of case definitions
 for (batch in 1:num_batches) {
-  path <- here("scripts", "Case_definitions", "BD batches", paste0("case_def_batch_bd", batch, ".rds"))
+  path <- here("batches", paste0("case_def_batch_bd", batch, ".rds"))
   batch_df <- readRDS(path)
   final_df <- cbind(final_df, batch_df)
 }
@@ -117,6 +117,16 @@ case_def_cols <- (grep("^case_def", names(dat_bd_symp), value = TRUE))
 # Initialize an empty list to store results
 results_list <- list()
 
+# Helper function for safe CI calculation (guards against zero denominators)
+safe_prop_ci <- function(x, n) {
+  if (n > 0) {
+    ci <- prop.test(x, n, conf.level = 0.95, correct = FALSE)
+    list(est = x / n, lower = ci$conf.int[1], upper = ci$conf.int[2])
+  } else {
+    list(est = NA, lower = NA, upper = NA)
+  }
+}
+
 for (case_col in case_def_cols) {
   # Calculate confusion matrix components
   tp <- sum(dat_bd_symp[[case_col]] == 1 & dat_bd_symp$infect_bin == 1)
@@ -124,26 +134,27 @@ for (case_col in case_def_cols) {
   tn <- sum(dat_bd_symp[[case_col]] == 0 & dat_bd_symp$infect_bin == 0)
   fn <- sum(dat_bd_symp[[case_col]] == 0 & dat_bd_symp$infect_bin == 1)
 
-  sens_ci <- prop.test(tp, tp + fn, conf.level = 0.95, correct = FALSE)
-  spec_ci <- prop.test(tn, tn + fp, conf.level = 0.95, correct = FALSE)
-  ppv_ci  <- prop.test(tp, tp + fp, conf.level = 0.95, correct = FALSE)
-  npv_ci  <- prop.test(tn, tn + fn, conf.level = 0.95, correct = FALSE)
+  # Compute statistics and CIs
+  sens <- safe_prop_ci(tp, tp + fn)
+  spec <- safe_prop_ci(tn, tn + fp)
+  ppv  <- safe_prop_ci(tp, tp + fp)
+  npv  <- safe_prop_ci(tn, tn + fn)
 
-ci_df <- data.frame(
-  case_def = case_col,
-  sensitivity = tp / (tp + fn),
-  sensitivity_lower = sens_ci$conf.int[1],
-  sensitivity_upper = sens_ci$conf.int[2],
-  specificity = tn / (tn + fp),
-  specificity_lower = spec_ci$conf.int[1],
-  specificity_upper = spec_ci$conf.int[2],
-  ppv = tp / (tp + fp),
-  ppv_lower = ppv_ci$conf.int[1],
-  ppv_upper = ppv_ci$conf.int[2],
-  npv = tn / (tn + fn),
-  npv_lower = npv_ci$conf.int[1],
-  npv_upper = npv_ci$conf.int[2]
-)
+  ci_df <- data.frame(
+    case_def = case_col,
+    sensitivity = sens$est,
+    sensitivity_lower = sens$lower,
+    sensitivity_upper = sens$upper,
+    specificity = spec$est,
+    specificity_lower = spec$lower,
+    specificity_upper = spec$upper,
+    ppv = ppv$est,
+    ppv_lower = ppv$lower,
+    ppv_upper = ppv$upper,
+    npv = npv$est,
+    npv_lower = npv$lower,
+    npv_upper = npv$upper
+  )
   # Store in results list
   results_list[[case_col]] <- ci_df
 }

@@ -25,17 +25,21 @@ library(rpart.plot)
 library(SuperLearner)
 library(ROCR)
 library(ggplot2)
-library(dplyr)
 library(janitor)
 library(tidyr)
 
 # Datasets restricted to 30 days post jaundice onset, including symptoms of itch, bleeding, and convulsion
-dat_ssd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_ssd_adjusted_children.rds")
+dat_ssd_symp <- readRDS(here("dat_ssd_adjusted_children.rds"))
 
 # Keep bleeding, itch, convulsion in this analysis. Want all signs/symptoms, regardless of prevalence
 
 # Remove demographcis
 dat_ssd_symp <- dat_ssd_symp %>% select(-id_sex, -age, -days_since_ajs_baseline) 
+
+# Symptoms are stored as "Yes"/"No" factors; recode to 0/1 integers so the
+# `== 1` comparisons used to build case definitions work as intended
+dat_ssd_symp <- dat_ssd_symp %>%
+  mutate(across(-infect_bin, ~ as.integer(. == "Yes")))
 
 ```
 
@@ -59,6 +63,7 @@ case_definitions <- lapply(1:length(symptom_names), function(k) {
 total_defs <- length(case_definitions)
 batch_size <- 500
 num_batches <- ceiling(total_defs / batch_size)
+dir.create(here("batches"), showWarnings = FALSE)
 
 # Loop through batches
 for (batch in 1:num_batches) {
@@ -85,7 +90,7 @@ for (batch in 1:num_batches) {
   batch_df <- batch_df %>% mutate(across(starts_with("case_def"), as.integer))
 
   # Save this batch separately
-  saveRDS(batch_df, file = paste0("case_def_children_batch_ssd", batch, ".rds"))
+  saveRDS(batch_df, file = here("batches", paste0("case_def_children_batch_ssd", batch, ".rds")))
 }
 
 # Start with the original data
@@ -93,7 +98,7 @@ final_df <- dat_ssd_symp
 
 # Append each batch of case definitions
 for (batch in 1:num_batches) {
-  path <- here("scripts", "Case_definitions", "SSD batches", paste0("case_def_children_batch_ssd", batch, ".rds"))
+  path <- here("batches", paste0("case_def_children_batch_ssd", batch, ".rds"))
   batch_df <- readRDS(path)
   final_df <- cbind(final_df, batch_df)
 }

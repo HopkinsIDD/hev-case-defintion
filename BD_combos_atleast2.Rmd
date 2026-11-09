@@ -27,7 +27,6 @@ library(ROCR)
 library(ggplot2)
 library(readr)
 library(janitor)
-library(dplyr)
 library(readxl)
 library(tidyr)
 library(ranger)
@@ -37,7 +36,7 @@ library(ResourceSelection)
 library(pROC)
 
 # Datasets restricted to 30 days post jaundice onset
-dat_bd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_bd_adjusted.rds")
+dat_bd_symp <- readRDS(here("dat_bd_adjusted.rds"))
 
 # Remove the demographics
 dat_bd_symp <- dat_bd_symp %>% select(-age, -sex, -days_since_ajs)
@@ -65,6 +64,7 @@ case_definitions <- case_definitions[-(1:9)]
 total_defs <- length(case_definitions)
 batch_size <- 500
 num_batches <- ceiling(total_defs / batch_size)
+dir.create(here("batches"), showWarnings = FALSE)
 
 library(future)
 library(furrr)
@@ -92,7 +92,7 @@ for (batch in 1:num_batches) {
   batch_df <- as.data.frame(batch_case_defs)
 
   # Save the batch
-  saveRDS(batch_df, file = paste0("case_def2_batch_bd", batch, ".rds"))
+  saveRDS(batch_df, file = here("batches", paste0("case_def2_batch_bd", batch, ".rds")))
 }
 
 
@@ -101,7 +101,7 @@ final_df <- dat_bd_symp
 
 # Append each batch of case definitions
 for (batch in 1:num_batches) {
-  path <- here("scripts", "Case_definitions", "BD batches", paste0("case_def2_batch_bd", batch, ".rds"))
+  path <- here("batches", paste0("case_def2_batch_bd", batch, ".rds"))
   batch_df <- readRDS(path)
   final_df <- cbind(final_df, batch_df)
 }

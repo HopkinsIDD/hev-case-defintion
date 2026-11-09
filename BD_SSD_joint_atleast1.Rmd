@@ -26,7 +26,6 @@ library(ROCR)
 library(ggplot2)
 library(readr)
 library(janitor)
-library(dplyr)
 library(readxl)
 library(tidyr)
 library(ranger)
@@ -34,13 +33,13 @@ library(kernlab)
 library(xgboost)
 
 # Load in each dataset
-dat_bd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_bd_adjusted.rds")
+dat_bd_symp <- readRDS(here("dat_bd_adjusted.rds"))
 
 # Remove demographics
 dat_bd_symp <- dat_bd_symp %>% select(-days_since_ajs, -sex, -age)
 
 # Datasets restricted to 30 days post jaundice onset
-dat_ssd_symp <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_ssd_adjusted.rds")
+dat_ssd_symp <- readRDS(here("dat_ssd_adjusted.rds"))
 
 # Remove demographics
 dat_ssd_symp <- dat_ssd_symp %>% select(-days_since_ajs_baseline, -id_sex, -age)
@@ -99,6 +98,7 @@ case_definitions <- lapply(1:length(symptom_names), function(k) {
 total_defs <- length(case_definitions)
 batch_size <- 500
 num_batches <- ceiling(total_defs / batch_size)
+dir.create(here("batches"), showWarnings = FALSE)
 
 # Loop through batches
 for (batch in 1:num_batches) {
@@ -126,7 +126,7 @@ for (batch in 1:num_batches) {
 
   
   # Save this batch separately
-  saveRDS(batch_df, file = paste0("case_def_batch_joined", batch, ".rds"))
+  saveRDS(batch_df, file = here("batches", paste0("case_def_batch_joined", batch, ".rds")))
 }
 
 # Start with the original data
@@ -134,7 +134,7 @@ final_df <- dat
 
 # Append each batch of case definitions
 for (batch in 1:num_batches) {
-  path <- here("scripts", "Case_definitions", paste0("case_def_batch_joined", batch, ".rds"))
+  path <- here("batches", paste0("case_def_batch_joined", batch, ".rds"))
   batch_df <- readRDS(path)
   final_df <- cbind(final_df, batch_df)
 }
@@ -188,6 +188,12 @@ compute_metrics_weighted <- function(data, case_col) {
 n_boot <- 1000
 set.seed(123)
 
+# Row indices for each site. Bootstrap resamples are drawn within site so that
+# each resample keeps the original SSD/BD sizes, matching the fixed 50/50 site
+# weights applied in compute_metrics_weighted()
+idx_ssd <- which(dat$dataset == 1)
+idx_bd  <- which(dat$dataset == 2)
+
 case_def_cols <- grep("^case_def", names(dat), value = TRUE)
 results_list <- list()
 
@@ -196,7 +202,10 @@ for (case_col in case_def_cols) {
 
   # Collect bootstrapped metrics
   metrics_boot <- replicate(n_boot, {
-    boot_sample <- dat[sample(1:nrow(dat), replace = TRUE), ]
+    # Stratified bootstrap: resample within each site
+    boot_idx <- c(sample(idx_ssd, replace = TRUE),
+                  sample(idx_bd,  replace = TRUE))
+    boot_sample <- dat[boot_idx, ]
     compute_metrics_weighted(boot_sample, case_col)
   })
 

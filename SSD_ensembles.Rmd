@@ -33,7 +33,7 @@ library(xgboost)
 library(pROC)
 
 # Symptoms and demographcis: 30 days post jaundice onset
-dat_ssd_adjusted <- readRDS("~/Desktop/GitRepos/hev_bentiu/scripts/Case_definitions/dat_ssd_adjusted.rds")
+dat_ssd_adjusted <- readRDS(here("dat_ssd_adjusted.rds"))
 dat_ssd_adjusted <- dat_ssd_adjusted %>% select(-bleeding, -itch, -convulsion)
 
 # Symptoms only: 30 days post jaundice onset
@@ -391,6 +391,21 @@ combined2
 Evaluate the sens/spec of existing case definitions
 
 ```{r case_def}
+# Sensitivity / specificity (with Wilson score CIs) of a binary case definition,
+# computed directly from the analytic dataset
+case_def_performance <- function(case_def, infect_bin) {
+  tp <- sum(case_def == 1 & infect_bin == 1, na.rm = TRUE)
+  fn <- sum(case_def == 0 & infect_bin == 1, na.rm = TRUE)
+  tn <- sum(case_def == 0 & infect_bin == 0, na.rm = TRUE)
+  fp <- sum(case_def == 1 & infect_bin == 0, na.rm = TRUE)
+  list(
+    tp = tp, fn = fn, tn = tn, fp = fp,
+    sens = tp / (tp + fn),
+    spec = tn / (tn + fp),
+    sens_ci = prop.test(tp, tp + fn, conf.level = 0.95, correct = FALSE)$conf.int,
+    spec_ci = prop.test(tn, tn + fp, conf.level = 0.95, correct = FALSE)$conf.int
+  )
+}
 ########################
 # MSF case definitions #
 ########################
@@ -402,11 +417,11 @@ TRUE ~ 0))
 # Compare sensitivity to ELISA+
 tabyl(dat_ssd_symp, msf_def, infect_bin)
 
- sens_msf <- 59 / (59+24)
- spec_msf <- 142 / (142+196)
-
-sens_msf_ci <- prop.test(59, 59 + 24, conf.level = 0.95, correct = FALSE)$conf.int
-spec_msf_ci <- prop.test(142, 142 + 196, conf.level = 0.95, correct = FALSE)$conf.int
+perf_msf <- case_def_performance(dat_ssd_symp$msf_def, dat_ssd_symp$infect_bin)
+sens_msf <- perf_msf$sens
+spec_msf <- perf_msf$spec
+sens_msf_ci <- perf_msf$sens_ci
+spec_msf_ci <- perf_msf$spec_ci
   
 sens_msf
 sens_msf_ci
@@ -425,11 +440,11 @@ TRUE ~ 0))
 # Compare sensitivity to ELISA+
 tabyl(dat_ssd_symp, who_def, infect_bin)
 
- sens_who <- 69 / (69 + 14)
- spec_who <- 49 / (49 + 289)
-
-sens_who_ci <- prop.test(69, 69 + 14, conf.level = 0.95, correct = FALSE)$conf.int
-spec_who_ci <- prop.test(49, 49 + 289, conf.level = 0.95, correct = FALSE)$conf.int
+perf_who <- case_def_performance(dat_ssd_symp$who_def, dat_ssd_symp$infect_bin)
+sens_who <- perf_who$sens
+spec_who <- perf_who$spec
+sens_who_ci <- perf_who$sens_ci
+spec_who_ci <- perf_who$spec_ci
 
 sens_who
 sens_who_ci
@@ -448,11 +463,11 @@ TRUE ~ 0))
 # Compare sensitivity to ELISA+
 tabyl(dat_ssd_symp, imc_def, infect_bin)
 
-sens_imc <- 80 / (80 + 3)
-spec_imc <- 21 / (21 + 317)
-
-sens_imc_ci <- prop.test(80, 80 + 3, conf.level = 0.95, correct = FALSE)$conf.int
-spec_imc_ci <- prop.test(21, 21 + 317, conf.level = 0.95, correct = FALSE)$conf.int
+perf_imc <- case_def_performance(dat_ssd_symp$imc_def, dat_ssd_symp$infect_bin)
+sens_imc <- perf_imc$sens
+spec_imc <- perf_imc$spec
+sens_imc_ci <- perf_imc$sens_ci
+spec_imc_ci <- perf_imc$spec_ci
   
 sens_imc
 sens_imc_ci
