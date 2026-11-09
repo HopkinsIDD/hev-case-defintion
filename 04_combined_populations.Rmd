@@ -1,0 +1,84 @@
+---
+title: "Combined South Sudan + Bangladesh analysis"
+output: html_document
+---
+
+Reproduces **Table S6** and **Figure S5**, plus the NPV quoted in the Discussion
+(acute jaundice plus abdominal pain or fatigue/malaise: 77%, 95% CI 74 to 80).
+
+Only symptoms collected in both populations are used. Post-stratification weights
+give each population 50% of the total weight. Weights sum to the total number of patients (2,046), so weighted 2x2 counts are in
+patient units. 95% CIs are percentile
+bootstrap intervals; resampling is done within each population so the weights stay
+fixed.
+
+```{r setup, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(ggplot2)
+source(here("R", "data.R"))
+source(here("R", "metrics.R"))
+source(here("R", "combos.R"))
+
+joint <- load_joint()
+count(joint, dataset, infect_bin)
+```
+
+```{r search}
+threshold <- 0.5
+joint_results <- lapply(c(at_least_1 = 1, at_least_2 = 2), function(k) {
+  evaluate_case_defs(joint, JOINT_SYMPTOMS, min_k = k, weights = joint$weight)
+})
+```
+
+## Table S6: top definitions by specificity
+
+```{r tableS6}
+set.seed(123)
+top <- lapply(names(joint_results), function(nm) {
+  k <- c(at_least_1 = 1, at_least_2 = 2)[[nm]]
+  best <- select_case_defs(joint_results[[nm]], threshold, n = 10)
+  ci <- bootstrap_case_defs(joint, JOINT_SYMPTOMS, k, best$id)
+  cbind(rule = nm, format_selected(left_join(best, ci, by = "id")))
+})
+top <- do.call(rbind, top)
+top
+```
+
+## Discussion: abdominal pain or fatigue/malaise
+
+```{r npv_example}
+example <- joint_results$at_least_1 %>% filter(case_def == "abdomen_ever + drowsy_ever")
+set.seed(123)
+example_ci <- bootstrap_case_defs(joint, JOINT_SYMPTOMS, 1, example$id)
+format_selected(left_join(example, example_ci, by = "id"))
+```
+
+## Figure S5
+
+The published figure shades specificity < 0.6 as "< WHO, IMC". In this combined dataset
+the international definitions have specificity of 36% (MSF), 26% (WHO) and 11% (IMC),
+so every plotted definition is more specific than all three. The shading is omitted
+here; the reference values are printed instead.
+
+```{r figS5, fig.width = 7, fig.height = 5}
+international_spec <- sapply(INTERNATIONAL_DEFS$bd, function(s) {
+  meets <- rowSums(joint[s]) >= 1
+  sum(joint$weight * (!meets & joint$infect_bin == 0)) / sum(joint$weight * (joint$infect_bin == 0))
+})
+round(international_spec, 2)
+
+abbrev <- c(abdomen_ever = "A", drowsy_ever = "F", head_ever = "H", mental_ever = "M",
+            nausea_ever = "N", vomit_ever = "V", appetite_ever = "L", fever_ever = "Fe",
+            diarrhea_ever = "D")
+top1 <- select_case_defs(joint_results$at_least_1, threshold, n = 10) %>%
+  mutate(label = vapply(strsplit(case_def, " + ", fixed = TRUE),
+                        function(s) paste(sort(abbrev[s]), collapse = "|"), ""))
+ggplot(top1, aes(specificity, sensitivity, label = label)) +
+  geom_point(size = 3) +
+  geom_text(hjust = -0.25, size = 3.5) +
+  coord_cartesian(xlim = c(0.5, 0.7), ylim = c(0.5, 0.6)) +
+  labs(x = "Specificity", y = "Sensitivity",
+       caption = "A abdominal pain, F fatigue/malaise, H headache, M mental status, N nausea, V vomiting") +
+  theme_minimal()
+```

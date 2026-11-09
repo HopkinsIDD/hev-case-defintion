@@ -1,0 +1,4 @@
+batches/
+*.html
+.Rproj.user/
+.Rhistory
