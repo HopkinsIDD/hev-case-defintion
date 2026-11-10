@@ -1,0 +1,11 @@
+population,model,auc,lower,upper
+"South Sudan, <=30 days",Signs/symptoms,0.64,0.57,0.71
+"South Sudan, <=30 days",Signs/symptoms plus demographics,0.73,0.67,0.79
+"Bangladesh, <=30 days",Signs/symptoms,0.60,0.57,0.62
+"Bangladesh, <=30 days",Signs/symptoms plus demographics,0.73,0.71,0.76
+"South Sudan, <=14 days",Signs/symptoms,0.63,0.55,0.70
+"South Sudan, <=14 days",Signs/symptoms plus demographics,0.73,0.67,0.80
+"Bangladesh, <=14 days",Signs/symptoms,0.61,0.57,0.65
+"Bangladesh, <=14 days",Signs/symptoms plus demographics,0.73,0.69,0.76
+South Sudan children,Signs/symptoms,0.53,0.47,0.59
+South Sudan children,Signs/symptoms plus demographics,0.61,0.55,0.67

@@ -64,6 +64,8 @@ ssd_kids <- run_ensembles(ssd_children, SSD_DEMOGRAPHICS, "South Sudan children"
 ```{r auc}
 aucs <- bind_rows(ssd_30$auc, bd_30$auc, ssd_14$auc, bd_14$auc, ssd_kids$auc)
 aucs %>% mutate(across(c(auc, lower, upper), ~ round(., 2)))
+# Cache for audit/audit.R, which checks the AUCs quoted in the paper without refitting
+write.csv(aucs, here("audit", "ensemble_aucs.csv"), row.names = FALSE)
 ```
 
 ## Figures

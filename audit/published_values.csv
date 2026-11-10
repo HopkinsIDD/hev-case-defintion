@@ -1,0 +1,554 @@
+id,source,item,published,tolerance,compare_to,note
+T3.ssd.N.all,T3,"N (ssd, all)",421,0,,
+T3.ssd.N.neg,T3,"N (ssd, neg)",338,0,,
+T3.ssd.N.pos,T3,"N (ssd, pos)",83,0,,
+T3.bd.N.all,T3,"N (bd, all)",1625,0,,
+T3.bd.N.neg,T3,"N (bd, neg)",1014,0,,
+T3.bd.N.pos,T3,"N (bd, pos)",611,0,,
+T3.ssd.female.all,T3,"Female (ssd, all)",210 (50),0,,
+T3.ssd.female.neg,T3,"Female (ssd, neg)",182 (54),0,,
+T3.ssd.female.pos,T3,"Female (ssd, pos)",28 (34),0,,
+T3.bd.female.all,T3,"Female (bd, all)",508 (31),0,,
+T3.bd.female.neg,T3,"Female (bd, neg)",346 (34),0,,
+T3.bd.female.pos,T3,"Female (bd, pos)",162 (27),0,,
+T3.ssd.age_median.all,T3,"Age, median (IQR) (ssd, all)","24.8 (19.2, 33.4)",0,,
+T3.ssd.age_median.neg,T3,"Age, median (IQR) (ssd, neg)","26.1 (20.1, 35.2)",0,,
+T3.ssd.age_median.pos,T3,"Age, median (IQR) (ssd, pos)","20.1 (16.6, 27.1)",0,,
+T3.bd.age_median.all,T3,"Age, median (IQR) (bd, all)","28.0 (20.0, 41.0)",0,,
+T3.bd.age_median.neg,T3,"Age, median (IQR) (bd, neg)","30.0 (22.0, 50.0)",0,,
+T3.bd.age_median.pos,T3,"Age, median (IQR) (bd, pos)","25.0 (20.0, 32.0)",0,,
+T3.ssd.age_14_19.all,T3,"14-19 (ssd, all)",123 (29),0,,
+T3.ssd.age_14_19.neg,T3,"14-19 (ssd, neg)",83 (25),0,,
+T3.ssd.age_14_19.pos,T3,"14-19 (ssd, pos)",40 (48),0,,
+T3.bd.age_14_19.all,T3,"14-19 (bd, all)",304 (19),0,,
+T3.bd.age_14_19.neg,T3,"14-19 (bd, neg)",186 (18),0,,
+T3.bd.age_14_19.pos,T3,"14-19 (bd, pos)",118 (19),0,,
+T3.ssd.age_20_39.all,T3,"20-39 (ssd, all)",234 (56),0,,
+T3.ssd.age_20_39.neg,T3,"20-39 (ssd, neg)",199 (59),0,,
+T3.ssd.age_20_39.pos,T3,"20-39 (ssd, pos)",35 (42),0,,
+T3.bd.age_20_39.all,T3,"20-39 (bd, all)",847 (52),0,,
+T3.bd.age_20_39.neg,T3,"20-39 (bd, neg)",439 (43),0,,
+T3.bd.age_20_39.pos,T3,"20-39 (bd, pos)",408 (67),0,,
+T3.ssd.age_40_59.all,T3,"40-59 (ssd, all)",53 (13),0,,
+T3.ssd.age_40_59.neg,T3,"40-59 (ssd, neg)",45 (13),0,,
+T3.ssd.age_40_59.pos,T3,"40-59 (ssd, pos)",8 (10),0,,
+T3.bd.age_40_59.all,T3,"40-59 (bd, all)",333 (20),0,,
+T3.bd.age_40_59.neg,T3,"40-59 (bd, neg)",254 (25),0,,
+T3.bd.age_40_59.pos,T3,"40-59 (bd, pos)",79 (13),0,,
+T3.ssd.age_60plus.all,T3,"60+ (ssd, all)",11 (3),0,,
+T3.ssd.age_60plus.neg,T3,"60+ (ssd, neg)",11 (3),0,,
+T3.ssd.age_60plus.pos,T3,"60+ (ssd, pos)",0 (0),0,,
+T3.bd.age_60plus.all,T3,"60+ (bd, all)",141 (9),0,,
+T3.bd.age_60plus.neg,T3,"60+ (bd, neg)",135 (13),0,,
+T3.bd.age_60plus.pos,T3,"60+ (bd, pos)",6 (1),0,,
+T3.ssd.days_median.all,T3,"Days since jaundice onset, median (IQR) (ssd, all)","4.0 (3.0, 9.0)",0,,
+T3.ssd.days_median.neg,T3,"Days since jaundice onset, median (IQR) (ssd, neg)","4.0 (3.0, 9.0)",0,,
+T3.ssd.days_median.pos,T3,"Days since jaundice onset, median (IQR) (ssd, pos)","5.0 (3.0, 9.0)",0,,
+T3.bd.days_median.all,T3,"Days since jaundice onset, median (IQR) (bd, all)","14.0 (8.0, 20.0)",0,,
+T3.bd.days_median.neg,T3,"Days since jaundice onset, median (IQR) (bd, neg)","14.0 (7.0, 20.0)",0,,
+T3.bd.days_median.pos,T3,"Days since jaundice onset, median (IQR) (bd, pos)","15.0 (8.0, 20.0)",0,,
+T3.ssd.igg.all,T3,"Anti-HEV IgG positive (ssd, all)",390 (93),0,,IgG not in analytic dataset
+T3.ssd.igg.neg,T3,"Anti-HEV IgG positive (ssd, neg)",308 (91),0,,IgG not in analytic dataset
+T3.ssd.igg.pos,T3,"Anti-HEV IgG positive (ssd, pos)",82 (99),0,,IgG not in analytic dataset
+T3.bd.igg.all,T3,"Anti-HEV IgG positive (bd, all)",909 (56),0,,IgG not in analytic dataset
+T3.bd.igg.neg,T3,"Anti-HEV IgG positive (bd, neg)",307 (30),0,,IgG not in analytic dataset
+T3.bd.igg.pos,T3,"Anti-HEV IgG positive (bd, pos)",602 (99),0,,IgG not in analytic dataset
+T3.ssd.yellow_skin.all,T3,"Yellow skin δ (ssd, all)",50 (12),0,,Jaundice signs not in analytic dataset
+T3.ssd.yellow_skin.neg,T3,"Yellow skin δ (ssd, neg)",35 (10),0,,Jaundice signs not in analytic dataset
+T3.ssd.yellow_skin.pos,T3,"Yellow skin δ (ssd, pos)",15 (18),0,,Jaundice signs not in analytic dataset
+T3.bd.yellow_skin.all,T3,"Yellow skin δ (bd, all)",1622 (100),0,,Jaundice signs not in analytic dataset
+T3.bd.yellow_skin.neg,T3,"Yellow skin δ (bd, neg)",1011 (100),0,,Jaundice signs not in analytic dataset
+T3.bd.yellow_skin.pos,T3,"Yellow skin δ (bd, pos)",611 (100),0,,Jaundice signs not in analytic dataset
+T3.ssd.yellow_eyes.all,T3,"Yellow eyes δ (ssd, all)",272 (65),0,,Jaundice signs not in analytic dataset
+T3.ssd.yellow_eyes.neg,T3,"Yellow eyes δ (ssd, neg)",207 (61),0,,Jaundice signs not in analytic dataset
+T3.ssd.yellow_eyes.pos,T3,"Yellow eyes δ (ssd, pos)",65 (78),0,,Jaundice signs not in analytic dataset
+T3.bd.yellow_eyes.all,T3,"Yellow eyes δ (bd, all)",1625 (100),0,,Jaundice signs not in analytic dataset
+T3.bd.yellow_eyes.neg,T3,"Yellow eyes δ (bd, neg)",1014 (100),0,,Jaundice signs not in analytic dataset
+T3.bd.yellow_eyes.pos,T3,"Yellow eyes δ (bd, pos)",611 (100),0,,Jaundice signs not in analytic dataset
+T3.ssd.dark_urine.all,T3,"Dark urine δ (ssd, all)",367 (87),0,,Jaundice signs not in analytic dataset
+T3.ssd.dark_urine.neg,T3,"Dark urine δ (ssd, neg)",292 (86),0,,Jaundice signs not in analytic dataset
+T3.ssd.dark_urine.pos,T3,"Dark urine δ (ssd, pos)",75 (90),0,,Jaundice signs not in analytic dataset
+T3.bd.dark_urine.all,T3,"Dark urine δ (bd, all)",1612 (99),0,,Jaundice signs not in analytic dataset
+T3.bd.dark_urine.neg,T3,"Dark urine δ (bd, neg)",1002 (99),0,,Jaundice signs not in analytic dataset
+T3.bd.dark_urine.pos,T3,"Dark urine δ (bd, pos)",610 (100),0,,Jaundice signs not in analytic dataset
+T3.ssd.pale_stools.all,T3,"Pale stools δ (ssd, all)",0 (0),0,,Jaundice signs not in analytic dataset
+T3.ssd.pale_stools.neg,T3,"Pale stools δ (ssd, neg)",0 (0),0,,Jaundice signs not in analytic dataset
+T3.ssd.pale_stools.pos,T3,"Pale stools δ (ssd, pos)",0 (0),0,,Jaundice signs not in analytic dataset
+T3.ssd.fever.all,T3,"Fever (ssd, all)",335 (80),0,,
+T3.ssd.fever.neg,T3,"Fever (ssd, neg)",272 (80),0,,
+T3.ssd.fever.pos,T3,"Fever (ssd, pos)",63 (76),0,,
+T3.bd.fever.all,T3,"Fever (bd, all)",659 (41),0,,
+T3.bd.fever.neg,T3,"Fever (bd, neg)",425 (42),0,,
+T3.bd.fever.pos,T3,"Fever (bd, pos)",234 (38),0,,
+T3.ssd.loss_of_appetite.all,T3,"Loss of appetite (ssd, all)",159 (38),0,,
+T3.ssd.loss_of_appetite.neg,T3,"Loss of appetite (ssd, neg)",121 (36),0,,
+T3.ssd.loss_of_appetite.pos,T3,"Loss of appetite (ssd, pos)",38 (46),0,,
+T3.bd.loss_of_appetite.all,T3,"Loss of appetite (bd, all)",1187 (73),0,,
+T3.bd.loss_of_appetite.neg,T3,"Loss of appetite (bd, neg)",745 (73),0,,
+T3.bd.loss_of_appetite.pos,T3,"Loss of appetite (bd, pos)",442 (72),0,,
+T3.ssd.nausea.all,T3,"Nausea (ssd, all)",67 (16),0,,
+T3.ssd.nausea.neg,T3,"Nausea (ssd, neg)",40 (12),0,,
+T3.ssd.nausea.pos,T3,"Nausea (ssd, pos)",27 (33),0,,
+T3.bd.nausea.all,T3,"Nausea (bd, all)",759 (47),0,,
+T3.bd.nausea.neg,T3,"Nausea (bd, neg)",460 (45),0,,
+T3.bd.nausea.pos,T3,"Nausea (bd, pos)",299 (49),0,,
+T3.ssd.diarrhoea.all,T3,"Diarrhoea (ssd, all)",100 (24),0,,
+T3.ssd.diarrhoea.neg,T3,"Diarrhoea (ssd, neg)",87 (26),0,,
+T3.ssd.diarrhoea.pos,T3,"Diarrhoea (ssd, pos)",13 (16),0,,
+T3.bd.diarrhoea.all,T3,"Diarrhoea (bd, all)",65 (4),0,,
+T3.bd.diarrhoea.neg,T3,"Diarrhoea (bd, neg)",39 (4),0,,
+T3.bd.diarrhoea.pos,T3,"Diarrhoea (bd, pos)",26 (4),0,,
+T3.ssd.vomiting.all,T3,"Vomiting (ssd, all)",102 (24),0,,
+T3.ssd.vomiting.neg,T3,"Vomiting (ssd, neg)",73 (22),0,,
+T3.ssd.vomiting.pos,T3,"Vomiting (ssd, pos)",29 (35),0,,
+T3.bd.vomiting.all,T3,"Vomiting (bd, all)",336 (21),0,,
+T3.bd.vomiting.neg,T3,"Vomiting (bd, neg)",212 (21),0,,
+T3.bd.vomiting.pos,T3,"Vomiting (bd, pos)",124 (20),0,,
+T3.ssd.headache.all,T3,"Headache (ssd, all)",92 (22),0,,
+T3.ssd.headache.neg,T3,"Headache (ssd, neg)",79 (23),0,,
+T3.ssd.headache.pos,T3,"Headache (ssd, pos)",13 (16),0,,
+T3.bd.headache.all,T3,"Headache (bd, all)",377 (23),0,,
+T3.bd.headache.neg,T3,"Headache (bd, neg)",242 (24),0,,
+T3.bd.headache.pos,T3,"Headache (bd, pos)",135 (22),0,,
+T3.ssd.abdominal_pain.all,T3,"Abdominal pain (ssd, all)",20 (5),0,,
+T3.ssd.abdominal_pain.neg,T3,"Abdominal pain (ssd, neg)",16 (5),0,,
+T3.ssd.abdominal_pain.pos,T3,"Abdominal pain (ssd, pos)",4 (5),0,,
+T3.bd.abdominal_pain.all,T3,"Abdominal pain (bd, all)",737 (45),0,,
+T3.bd.abdominal_pain.neg,T3,"Abdominal pain (bd, neg)",450 (44),0,,
+T3.bd.abdominal_pain.pos,T3,"Abdominal pain (bd, pos)",287 (47),0,,
+T3.ssd.altered_mental_state.all,T3,"Altered mental state (ssd, all)",25 (6),0,,
+T3.ssd.altered_mental_state.neg,T3,"Altered mental state (ssd, neg)",19 (6),0,,
+T3.ssd.altered_mental_state.pos,T3,"Altered mental state (ssd, pos)",6 (7),0,,
+T3.bd.altered_mental_state.all,T3,"Altered mental state (bd, all)",83 (5),0,,
+T3.bd.altered_mental_state.neg,T3,"Altered mental state (bd, neg)",69 (7),0,,
+T3.bd.altered_mental_state.pos,T3,"Altered mental state (bd, pos)",14 (2),0,,
+T3.ssd.fatigue_drowsy.all,T3,"Fatigue/drowsy (ssd, all)",76 (18),0,,
+T3.ssd.fatigue_drowsy.neg,T3,"Fatigue/drowsy (ssd, neg)",45 (13),0,,
+T3.ssd.fatigue_drowsy.pos,T3,"Fatigue/drowsy (ssd, pos)",31 (37),0,,
+T3.bd.fatigue_drowsy.all,T3,"Fatigue/drowsy (bd, all)",565 (35),0,,
+T3.bd.fatigue_drowsy.neg,T3,"Fatigue/drowsy (bd, neg)",377 (37),0,,
+T3.bd.fatigue_drowsy.pos,T3,"Fatigue/drowsy (bd, pos)",188 (31),0,,
+T3.ssd.convulsion.all,T3,"Convulsion (ssd, all)",1 (0.2),0,,
+T3.ssd.convulsion.neg,T3,"Convulsion (ssd, neg)",1 (0.3),0,,
+T3.ssd.convulsion.pos,T3,"Convulsion (ssd, pos)",0 (0),0,,
+T3.bd.convulsion.all,T3,"Convulsion (bd, all)",38 (2),0,,
+T3.bd.convulsion.neg,T3,"Convulsion (bd, neg)",28 (3),0,,
+T3.bd.convulsion.pos,T3,"Convulsion (bd, pos)",10 (2),0,,
+T3.ssd.epigastric_pain.all,T3,"Epigastric pain (ssd, all)",118 (28),0,,
+T3.ssd.epigastric_pain.neg,T3,"Epigastric pain (ssd, neg)",88 (26),0,,
+T3.ssd.epigastric_pain.pos,T3,"Epigastric pain (ssd, pos)",30 (36),0,,
+T3.ssd.cough.all,T3,"Cough (ssd, all)",49 (12),0,,
+T3.ssd.cough.neg,T3,"Cough (ssd, neg)",46 (14),0,,
+T3.ssd.cough.pos,T3,"Cough (ssd, pos)",3 (4),0,,
+T3.ssd.joint_pains.all,T3,"Joint pains (ssd, all)",207 (49),0,,
+T3.ssd.joint_pains.neg,T3,"Joint pains (ssd, neg)",165 (49),0,,
+T3.ssd.joint_pains.pos,T3,"Joint pains (ssd, pos)",42 (51),0,,
+T3.ssd.itch.all,T3,"Itch (ssd, all)",10 (2),0,,
+T3.ssd.itch.neg,T3,"Itch (ssd, neg)",7 (2),0,,
+T3.ssd.itch.pos,T3,"Itch (ssd, pos)",3 (4),0,,
+T3.ssd.bleeding.all,T3,"Bleeding (ssd, all)",7 (2),0,,
+T3.ssd.bleeding.neg,T3,"Bleeding (ssd, neg)",6 (2),0,,
+T3.ssd.bleeding.pos,T3,"Bleeding (ssd, pos)",1 (1),0,,
+T3.bd.melaena.all,T3,"Melaena (bd, all)",102 (6),0,,
+T3.bd.melaena.neg,T3,"Melaena (bd, neg)",67 (7),0,,
+T3.bd.melaena.pos,T3,"Melaena (bd, pos)",35 (6),0,,
+T3.bd.constipation.all,T3,"Constipation (bd, all)",430 (26),0,,
+T3.bd.constipation.neg,T3,"Constipation (bd, neg)",225 (22),0,,
+T3.bd.constipation.pos,T3,"Constipation (bd, pos)",205 (34),0,,
+T3.bd.unconsciousness.all,T3,"Unconsciousness (bd, all)",50 (3),0,,
+T3.bd.unconsciousness.neg,T3,"Unconsciousness (bd, neg)",33 (3),0,,
+T3.bd.unconsciousness.pos,T3,"Unconsciousness (bd, pos)",17 (3),0,,
+T3.bd.distended_abdomen.all,T3,"Distended abdomen δδ (bd, all)",225 (14),0,,
+T3.bd.distended_abdomen.neg,T3,"Distended abdomen δδ (bd, neg)",165 (16),0,,
+T3.bd.distended_abdomen.pos,T3,"Distended abdomen δδ (bd, pos)",60 (10),0,,
+T3.bd.oedema.all,T3,"Oedema δδ (bd, all)",143 (9),0,,
+T3.bd.oedema.neg,T3,"Oedema δδ (bd, neg)",119 (12),0,,
+T3.bd.oedema.pos,T3,"Oedema δδ (bd, pos)",24 (4),0,,
+T3.bd.dehydration.all,T3,"Dehydration δδ (bd, all)",307 (19),0,,
+T3.bd.dehydration.neg,T3,"Dehydration δδ (bd, neg)",184 (18),0,,
+T3.bd.dehydration.pos,T3,"Dehydration δδ (bd, pos)",123 (20),0,,
+T3.bd.liver_palpable.all,T3,"Liver palpable δδ (bd, all)",177 (11),0,,
+T3.bd.liver_palpable.neg,T3,"Liver palpable δδ (bd, neg)",137(14),0,,
+T3.bd.liver_palpable.pos,T3,"Liver palpable δδ (bd, pos)",40 (7),0,,
+T3.ssd.hospitalized.all,T3,"Hospitalized (ssd, all)",28 (7),0,,Hospitalisation not in analytic dataset
+T3.ssd.hospitalized.neg,T3,"Hospitalized (ssd, neg)",22 (7),0,,Hospitalisation not in analytic dataset
+T3.ssd.hospitalized.pos,T3,"Hospitalized (ssd, pos)",6 (7),0,,Hospitalisation not in analytic dataset
+T3.bd.hospitalized.all,T3,"Hospitalized (bd, all)",1625 (100),0,,Hospitalisation not in analytic dataset
+T3.bd.hospitalized.neg,T3,"Hospitalized (bd, neg)",1014 (100),0,,Hospitalisation not in analytic dataset
+T3.bd.hospitalized.pos,T3,"Hospitalized (bd, pos)",611 (100),0,,Hospitalisation not in analytic dataset
+T3.ssd.died.all,T3,"Died* (ssd, all)",6 (1),0,,Deaths not in analytic dataset
+T3.ssd.died.neg,T3,"Died* (ssd, neg)",5 (1),0,,Deaths not in analytic dataset
+T3.ssd.died.pos,T3,"Died* (ssd, pos)",1 (1),0,,Deaths not in analytic dataset
+T3.bd.died.all,T3,"Died* (bd, all)",51 (3),0,,Deaths not in analytic dataset
+T3.bd.died.neg,T3,"Died* (bd, neg)",41 (4),0,,Deaths not in analytic dataset
+T3.bd.died.pos,T3,"Died* (bd, pos)",10 (2),0,,Deaths not in analytic dataset
+S3.children.N.all,S3,"N (children, all)",394,0,,
+S3.children.N.neg,S3,"N (children, neg)",255,0,,
+S3.children.N.pos,S3,"N (children, pos)",139,0,,
+S3.children.female.all,S3,"Female (children, all)",160 (41),0,,
+S3.children.female.neg,S3,"Female (children, neg)",88 (35),0,,
+S3.children.female.pos,S3,"Female (children, pos)",72 (52),0,,
+S3.children.age_median.all,S3,"Age, median (IQR) (children, all)","5.5 (3.4, 9.5)",0,,
+S3.children.age_median.neg,S3,"Age, median (IQR) (children, neg)","5.4 (3.2, 10.1)",0,,
+S3.children.age_median.pos,S3,"Age, median (IQR) (children, pos)","5.8 (3.8, 8.0)",0,,
+S3.children.age_0_4.all,S3,"0-4 (children, all)",160 (41),0,,
+S3.children.age_0_4.neg,S3,"0-4 (children, neg)",109 (43),0,,
+S3.children.age_0_4.pos,S3,"0-4 (children, pos)",51 (37),0,,
+S3.children.age_5_10.all,S3,"5-10 (children, all)",70 (18),0,,
+S3.children.age_5_10.neg,S3,"5-10 (children, neg)",52 (20),0,,
+S3.children.age_5_10.pos,S3,"5-10 (children, pos)",18 (13),0,,
+S3.children.age_11_13.all,S3,"11-13 (children, all)",164 (42),0,,
+S3.children.age_11_13.neg,S3,"11-13 (children, neg)",94 (37),0,,
+S3.children.age_11_13.pos,S3,"11-13 (children, pos)",70 (50),0,,
+S3.children.days_median.all,S3,"Days since jaundice onset, median (IQR) (children, all)","4.0 (3.0, 7.0)",0,,
+S3.children.days_median.neg,S3,"Days since jaundice onset, median (IQR) (children, neg)","4.0 (2.0, 7.0)",0,,
+S3.children.days_median.pos,S3,"Days since jaundice onset, median (IQR) (children, pos)","4.0 (3.0, 6.0)",0,,
+S3.children.delay_lt1w.all,S3,"< 1 week (children, all)",320 (81),0,,
+S3.children.delay_lt1w.neg,S3,"< 1 week (children, neg)",206 (81),0,,
+S3.children.delay_lt1w.pos,S3,"< 1 week (children, pos)",114 (82),0,,
+S3.children.delay_1_2w.all,S3,">1 week to 2 weeks (children, all)",51 (13),0,,
+S3.children.delay_1_2w.neg,S3,">1 week to 2 weeks (children, neg)",30 (12),0,,
+S3.children.delay_1_2w.pos,S3,">1 week to 2 weeks (children, pos)",21 (15),0,,
+S3.children.delay_2w_1m.all,S3,">2 weeks to 1 month (children, all)",23 (6),0,,
+S3.children.delay_2w_1m.neg,S3,">2 weeks to 1 month (children, neg)",19 (7),0,,
+S3.children.delay_2w_1m.pos,S3,">2 weeks to 1 month (children, pos)",4 (3),0,,
+S3.children.igg.all,S3,"Anti-HEV IgG positive (children, all)",307 (78),0,,IgG not in analytic dataset
+S3.children.igg.neg,S3,"Anti-HEV IgG positive (children, neg)",170 (67),0,,IgG not in analytic dataset
+S3.children.igg.pos,S3,"Anti-HEV IgG positive (children, pos)",137 (99),0,,IgG not in analytic dataset
+S3.children.yellow_skin.all,S3,"Yellow skin δ (children, all)",51 (13),0,,Jaundice signs not in analytic dataset
+S3.children.yellow_skin.neg,S3,"Yellow skin δ (children, neg)",29 (11),0,,Jaundice signs not in analytic dataset
+S3.children.yellow_skin.pos,S3,"Yellow skin δ (children, pos)",22 (16),0,,Jaundice signs not in analytic dataset
+S3.children.yellow_eyes.all,S3,"Yellow eyes δ (children, all)",320 (81),0,,Jaundice signs not in analytic dataset
+S3.children.yellow_eyes.neg,S3,"Yellow eyes δ (children, neg)",206 (81),0,,Jaundice signs not in analytic dataset
+S3.children.yellow_eyes.pos,S3,"Yellow eyes δ (children, pos)",114 (82),0,,Jaundice signs not in analytic dataset
+S3.children.dark_urine.all,S3,"Dark urine δ (children, all)",327 (83),0,,Jaundice signs not in analytic dataset
+S3.children.dark_urine.neg,S3,"Dark urine δ (children, neg)",202 (79),0,,Jaundice signs not in analytic dataset
+S3.children.dark_urine.pos,S3,"Dark urine δ (children, pos)",125 (90),0,,Jaundice signs not in analytic dataset
+S3.children.pale_stools.all,S3,"Pale stools δ (children, all)",16 (4),0,,Jaundice signs not in analytic dataset
+S3.children.pale_stools.neg,S3,"Pale stools δ (children, neg)",13 (5),0,,Jaundice signs not in analytic dataset
+S3.children.pale_stools.pos,S3,"Pale stools δ (children, pos)",3 (2),0,,Jaundice signs not in analytic dataset
+S3.children.fever.all,S3,"Fever (children, all)",349 (89),0,,
+S3.children.fever.neg,S3,"Fever (children, neg)",225 (88),0,,
+S3.children.fever.pos,S3,"Fever (children, pos)",124 (89),0,,
+S3.children.loss_of_appetite.all,S3,"Loss of appetite (children, all)",208 (53),0,,
+S3.children.loss_of_appetite.neg,S3,"Loss of appetite (children, neg)",127 (50),0,,
+S3.children.loss_of_appetite.pos,S3,"Loss of appetite (children, pos)",81 (58),0,,
+S3.children.nausea.all,S3,"Nausea (children, all)",39 (10),0,,
+S3.children.nausea.neg,S3,"Nausea (children, neg)",27 (11),0,,
+S3.children.nausea.pos,S3,"Nausea (children, pos)",12 (9),0,,
+S3.children.diarrhoea.all,S3,"Diarrhoea (children, all)",137 (35),0,,
+S3.children.diarrhoea.neg,S3,"Diarrhoea (children, neg)",93 (36),0,,
+S3.children.diarrhoea.pos,S3,"Diarrhoea (children, pos)",44 (32),0,,
+S3.children.vomiting.all,S3,"Vomiting (children, all)",128 (32),0,,
+S3.children.vomiting.neg,S3,"Vomiting (children, neg)",85 (33),0,,
+S3.children.vomiting.pos,S3,"Vomiting (children, pos)",43 (31),0,,
+S3.children.headache.all,S3,"Headache (children, all)",27 (7),0,,
+S3.children.headache.neg,S3,"Headache (children, neg)",16 (6),0,,
+S3.children.headache.pos,S3,"Headache (children, pos)",11 (8),0,,
+S3.children.abdominal_pain.all,S3,"Abdominal pain (children, all)",6 (2),0,,
+S3.children.abdominal_pain.neg,S3,"Abdominal pain (children, neg)",4 (2),0,,
+S3.children.abdominal_pain.pos,S3,"Abdominal pain (children, pos)",2 (1),0,,
+S3.children.altered_mental_state.all,S3,"Altered mental state (children, all)",20 (5),0,,
+S3.children.altered_mental_state.neg,S3,"Altered mental state (children, neg)",17 (7),0,,
+S3.children.altered_mental_state.pos,S3,"Altered mental state (children, pos)",3 (2),0,,
+S3.children.fatigue_drowsy.all,S3,"Fatigue/drowsy (children, all)",50 (13),0,,
+S3.children.fatigue_drowsy.neg,S3,"Fatigue/drowsy (children, neg)",33 (13),0,,
+S3.children.fatigue_drowsy.pos,S3,"Fatigue/drowsy (children, pos)",17 (12),0,,
+S3.children.convulsion.all,S3,"Convulsion (children, all)",6 (2),0,,
+S3.children.convulsion.neg,S3,"Convulsion (children, neg)",6 (2),0,,
+S3.children.convulsion.pos,S3,"Convulsion (children, pos)",0 (0),0,,
+S3.children.epigastric_pain.all,S3,"Epigastric pain (children, all)",65 (16),0,,
+S3.children.epigastric_pain.neg,S3,"Epigastric pain (children, neg)",50 (20),0,,
+S3.children.epigastric_pain.pos,S3,"Epigastric pain (children, pos)",15 (11),0,,
+S3.children.cough.all,S3,"Cough (children, all)",114 (29),0,,
+S3.children.cough.neg,S3,"Cough (children, neg)",80 (31),0,,
+S3.children.cough.pos,S3,"Cough (children, pos)",34 (24),0,,
+S3.children.joint_pains.all,S3,"Joint pains (children, all)",89 (23),0,,
+S3.children.joint_pains.neg,S3,"Joint pains (children, neg)",61 (24),0,,
+S3.children.joint_pains.pos,S3,"Joint pains (children, pos)",28 (20),0,,
+S3.children.itch.all,S3,"Itch (children, all)",4 (1),0,,
+S3.children.itch.neg,S3,"Itch (children, neg)",4 (2),0,,
+S3.children.itch.pos,S3,"Itch (children, pos)",0 (0),0,,
+S3.children.bleeding.all,S3,"Bleeding (children, all)",5 (1),0,,
+S3.children.bleeding.neg,S3,"Bleeding (children, neg)",,0,,Blank in published table
+S3.children.bleeding.pos,S3,"Bleeding (children, pos)",,0,,Blank in published table
+S3.children.hospitalized.all,S3,"Hospitalized* (children, all)",25 (6),0,,Hospitalisation not in analytic dataset
+S3.children.hospitalized.neg,S3,"Hospitalized* (children, neg)",20 (8),0,,Hospitalisation not in analytic dataset
+S3.children.hospitalized.pos,S3,"Hospitalized* (children, pos)",5 (4),0,,Hospitalisation not in analytic dataset
+S3.children.died.all,S3,"Died (children, all)",3 (1),0,,Deaths not in analytic dataset
+S3.children.died.neg,S3,"Died (children, neg)",3 (1),0,,Deaths not in analytic dataset
+S3.children.died.pos,S3,"Died (children, pos)",0 (0),0,,Deaths not in analytic dataset
+S2.ssd.fever.delay_lt1w,S2,"Fever (ssd, delay_lt1w)",82%,0,,
+S2.ssd_hosp.fever.delay_lt1w,S2,"Fever (ssd_hosp, delay_lt1w)",73%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.fever.delay_lt1w,S2,"Fever (bd, delay_lt1w)",42%,0,,
+S2.ssd.fever.delay_1_2w,S2,"Fever (ssd, delay_1_2w)",76%,0,,
+S2.ssd_hosp.fever.delay_1_2w,S2,"Fever (ssd_hosp, delay_1_2w)",75%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.fever.delay_1_2w,S2,"Fever (bd, delay_1_2w)",39%,0,,
+S2.ssd.fever.delay_2w_1m,S2,"Fever (ssd, delay_2w_1m)",72%,0,,
+S2.ssd_hosp.fever.delay_2w_1m,S2,"Fever (ssd_hosp, delay_2w_1m)",100%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.fever.delay_2w_1m,S2,"Fever (bd, delay_2w_1m)",42%,0,,
+S2.ssd.loss_of_appetite.delay_lt1w,S2,"Loss of appetite (ssd, delay_lt1w)",37%,0,,
+S2.ssd_hosp.loss_of_appetite.delay_lt1w,S2,"Loss of appetite (ssd_hosp, delay_lt1w)",50%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.loss_of_appetite.delay_lt1w,S2,"Loss of appetite (bd, delay_lt1w)",76%,0,,
+S2.ssd.loss_of_appetite.delay_1_2w,S2,"Loss of appetite (ssd, delay_1_2w)",44%,0,,
+S2.ssd_hosp.loss_of_appetite.delay_1_2w,S2,"Loss of appetite (ssd_hosp, delay_1_2w)",50%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.loss_of_appetite.delay_1_2w,S2,"Loss of appetite (bd, delay_1_2w)",70%,0,,
+S2.ssd.loss_of_appetite.delay_2w_1m,S2,"Loss of appetite (ssd, delay_2w_1m)",34%,0,,
+S2.ssd_hosp.loss_of_appetite.delay_2w_1m,S2,"Loss of appetite (ssd_hosp, delay_2w_1m)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.loss_of_appetite.delay_2w_1m,S2,"Loss of appetite (bd, delay_2w_1m)",73%,0,,
+S2.ssd.nausea.delay_lt1w,S2,"Nausea (ssd, delay_lt1w)",13%,0,,
+S2.ssd_hosp.nausea.delay_lt1w,S2,"Nausea (ssd_hosp, delay_lt1w)",32%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.nausea.delay_lt1w,S2,"Nausea (bd, delay_lt1w)",50%,0,,
+S2.ssd.nausea.delay_1_2w,S2,"Nausea (ssd, delay_1_2w)",24%,0,,
+S2.ssd_hosp.nausea.delay_1_2w,S2,"Nausea (ssd_hosp, delay_1_2w)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.nausea.delay_1_2w,S2,"Nausea (bd, delay_1_2w)",44%,0,,
+S2.ssd.nausea.delay_2w_1m,S2,"Nausea (ssd, delay_2w_1m)",22%,0,,
+S2.ssd_hosp.nausea.delay_2w_1m,S2,"Nausea (ssd_hosp, delay_2w_1m)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.nausea.delay_2w_1m,S2,"Nausea (bd, delay_2w_1m)",47%,0,,
+S2.ssd.diarrhea.delay_lt1w,S2,"Diarrhea (ssd, delay_lt1w)",26%,0,,
+S2.ssd_hosp.diarrhea.delay_lt1w,S2,"Diarrhea (ssd_hosp, delay_lt1w)",41%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.diarrhea.delay_lt1w,S2,"Diarrhea (bd, delay_lt1w)",6%,0,,
+S2.ssd.diarrhea.delay_1_2w,S2,"Diarrhea (ssd, delay_1_2w)",15%,0,,
+S2.ssd_hosp.diarrhea.delay_1_2w,S2,"Diarrhea (ssd_hosp, delay_1_2w)",25%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.diarrhea.delay_1_2w,S2,"Diarrhea (bd, delay_1_2w)",3%,0,,
+S2.ssd.diarrhea.delay_2w_1m,S2,"Diarrhea (ssd, delay_2w_1m)",22%,0,,
+S2.ssd_hosp.diarrhea.delay_2w_1m,S2,"Diarrhea (ssd_hosp, delay_2w_1m)",100%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.diarrhea.delay_2w_1m,S2,"Diarrhea (bd, delay_2w_1m)",4%,0,,
+S2.ssd.vomiting.delay_lt1w,S2,"Vomiting (ssd, delay_lt1w)",23%,0,,
+S2.ssd_hosp.vomiting.delay_lt1w,S2,"Vomiting (ssd_hosp, delay_lt1w)",73%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.vomiting.delay_lt1w,S2,"Vomiting (bd, delay_lt1w)",26%,0,,
+S2.ssd.vomiting.delay_1_2w,S2,"Vomiting (ssd, delay_1_2w)",28%,0,,
+S2.ssd_hosp.vomiting.delay_1_2w,S2,"Vomiting (ssd_hosp, delay_1_2w)",50%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.vomiting.delay_1_2w,S2,"Vomiting (bd, delay_1_2w)",22%,0,,
+S2.ssd.vomiting.delay_2w_1m,S2,"Vomiting (ssd, delay_2w_1m)",24%,0,,
+S2.ssd_hosp.vomiting.delay_2w_1m,S2,"Vomiting (ssd_hosp, delay_2w_1m)",50%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.vomiting.delay_2w_1m,S2,"Vomiting (bd, delay_2w_1m)",17%,0,,
+S2.ssd.headache.delay_lt1w,S2,"Headache (ssd, delay_lt1w)",20%,0,,
+S2.ssd_hosp.headache.delay_lt1w,S2,"Headache (ssd_hosp, delay_lt1w)",5%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.headache.delay_lt1w,S2,"Headache (bd, delay_lt1w)",23%,0,,
+S2.ssd.headache.delay_1_2w,S2,"Headache (ssd, delay_1_2w)",23%,0,,
+S2.ssd_hosp.headache.delay_1_2w,S2,"Headache (ssd_hosp, delay_1_2w)",25%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.headache.delay_1_2w,S2,"Headache (bd, delay_1_2w)",23%,0,,
+S2.ssd.headache.delay_2w_1m,S2,"Headache (ssd, delay_2w_1m)",32%,0,,
+S2.ssd_hosp.headache.delay_2w_1m,S2,"Headache (ssd_hosp, delay_2w_1m)",50%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.headache.delay_2w_1m,S2,"Headache (bd, delay_2w_1m)",23%,0,,
+S2.ssd.abdominal_pain.delay_lt1w,S2,"Abdominal pain (ssd, delay_lt1w)",5%,0,,
+S2.ssd_hosp.abdominal_pain.delay_lt1w,S2,"Abdominal pain (ssd_hosp, delay_lt1w)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.abdominal_pain.delay_lt1w,S2,"Abdominal pain (bd, delay_lt1w)",42%,0,,
+S2.ssd.abdominal_pain.delay_1_2w,S2,"Abdominal pain (ssd, delay_1_2w)",4%,0,,
+S2.ssd_hosp.abdominal_pain.delay_1_2w,S2,"Abdominal pain (ssd_hosp, delay_1_2w)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.abdominal_pain.delay_1_2w,S2,"Abdominal pain (bd, delay_1_2w)",45%,0,,
+S2.ssd.abdominal_pain.delay_2w_1m,S2,"Abdominal pain (ssd, delay_2w_1m)",10%,0,,
+S2.ssd_hosp.abdominal_pain.delay_2w_1m,S2,"Abdominal pain (ssd_hosp, delay_2w_1m)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.abdominal_pain.delay_2w_1m,S2,"Abdominal pain (bd, delay_2w_1m)",47%,0,,
+S2.ssd.altered_mental_state.delay_lt1w,S2,"Altered mental state (ssd, delay_lt1w)",8%,0,,
+S2.ssd_hosp.altered_mental_state.delay_lt1w,S2,"Altered mental state (ssd_hosp, delay_lt1w)",36%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.altered_mental_state.delay_lt1w,S2,"Altered mental state (bd, delay_lt1w)",4%,0,,
+S2.ssd.altered_mental_state.delay_1_2w,S2,"Altered mental state (ssd, delay_1_2w)",4%,0,,
+S2.ssd_hosp.altered_mental_state.delay_1_2w,S2,"Altered mental state (ssd_hosp, delay_1_2w)",50%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.altered_mental_state.delay_1_2w,S2,"Altered mental state (bd, delay_1_2w)",3%,0,,
+S2.ssd.altered_mental_state.delay_2w_1m,S2,"Altered mental state (ssd, delay_2w_1m)",0%,0,,
+S2.ssd_hosp.altered_mental_state.delay_2w_1m,S2,"Altered mental state (ssd_hosp, delay_2w_1m)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.altered_mental_state.delay_2w_1m,S2,"Altered mental state (bd, delay_2w_1m)",7%,0,,
+S2.ssd.fatigue_drowsiness.delay_lt1w,S2,"Fatigue/drowsiness (ssd, delay_lt1w)",16%,0,,
+S2.ssd_hosp.fatigue_drowsiness.delay_lt1w,S2,"Fatigue/drowsiness (ssd_hosp, delay_lt1w)",18%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.fatigue_drowsiness.delay_lt1w,S2,"Fatigue/drowsiness (bd, delay_lt1w)",33%,0,,
+S2.ssd.fatigue_drowsiness.delay_1_2w,S2,"Fatigue/drowsiness (ssd, delay_1_2w)",23%,0,,
+S2.ssd_hosp.fatigue_drowsiness.delay_1_2w,S2,"Fatigue/drowsiness (ssd_hosp, delay_1_2w)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.fatigue_drowsiness.delay_1_2w,S2,"Fatigue/drowsiness (bd, delay_1_2w)",32%,0,,
+S2.ssd.fatigue_drowsiness.delay_2w_1m,S2,"Fatigue/drowsiness (ssd, delay_2w_1m)",24%,0,,
+S2.ssd_hosp.fatigue_drowsiness.delay_2w_1m,S2,"Fatigue/drowsiness (ssd_hosp, delay_2w_1m)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.fatigue_drowsiness.delay_2w_1m,S2,"Fatigue/drowsiness (bd, delay_2w_1m)",37%,0,,
+S2.ssd.convulsion.delay_lt1w,S2,"Convulsion (ssd, delay_lt1w)",0%,0,,
+S2.ssd_hosp.convulsion.delay_lt1w,S2,"Convulsion (ssd_hosp, delay_lt1w)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.convulsion.delay_lt1w,S2,"Convulsion (bd, delay_lt1w)",3%,0,,
+S2.ssd.convulsion.delay_1_2w,S2,"Convulsion (ssd, delay_1_2w)",0%,0,,
+S2.ssd_hosp.convulsion.delay_1_2w,S2,"Convulsion (ssd_hosp, delay_1_2w)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.convulsion.delay_1_2w,S2,"Convulsion (bd, delay_1_2w)",2%,0,,
+S2.ssd.convulsion.delay_2w_1m,S2,"Convulsion (ssd, delay_2w_1m)",2%,0,,
+S2.ssd_hosp.convulsion.delay_2w_1m,S2,"Convulsion (ssd_hosp, delay_2w_1m)",0%,0,,Hospitalised SSD subset not in analytic dataset
+S2.bd.convulsion.delay_2w_1m,S2,"Convulsion (bd, delay_2w_1m)",2%,0,,
+T4.ssd.AJ.tp,T4,AJ tp (ssd),83,0,,
+T4.ssd.AJ.fp,T4,AJ fp (ssd),335,0,,
+T4.ssd.AJ.fn,T4,AJ fn (ssd),0,0,,
+T4.ssd.AJ.tn,T4,AJ tn (ssd),0,0,,
+T4.ssd.AJ.sens,T4,AJ sensitivity (ssd),100%,0,,
+T4.ssd.AJ.spec,T4,AJ specificity (ssd),0%,0,,
+T4.bd.AJ.tp,T4,AJ tp (bd),611,0,,
+T4.bd.AJ.fp,T4,AJ fp (bd),1014,0,,
+T4.bd.AJ.fn,T4,AJ fn (bd),0,0,,
+T4.bd.AJ.tn,T4,AJ tn (bd),0,0,,
+T4.bd.AJ.sens,T4,AJ sensitivity (bd),100%,0,,
+T4.bd.AJ.spec,T4,AJ specificity (bd),0%,0,,
+T4.ssd.MSF.tp,T4,MSF tp (ssd),59,0,,
+T4.ssd.MSF.fp,T4,MSF fp (ssd),196,0,,
+T4.ssd.MSF.fn,T4,MSF fn (ssd),24,0,,
+T4.ssd.MSF.tn,T4,MSF tn (ssd),142,0,,
+T4.ssd.MSF.sens,T4,MSF sensitivity (ssd),"71% (61, 80)",0,,
+T4.ssd.MSF.spec,T4,MSF specificity (ssd),"42% (37, 47)",0,,
+T4.bd.MSF.tp,T4,MSF tp (bd),495,0,,
+T4.bd.MSF.fp,T4,MSF fp (bd),842,0,,
+T4.bd.MSF.fn,T4,MSF fn (bd),116,0,,
+T4.bd.MSF.tn,T4,MSF tn (bd),172,0,,
+T4.bd.MSF.sens,T4,MSF sensitivity (bd),"81% (78, 84)",0,,
+T4.bd.MSF.spec,T4,MSF specificity (bd),"17% (15, 19)",0,,
+T4.ssd.WHO.tp,T4,WHO tp (ssd),69,0,,
+T4.ssd.WHO.fp,T4,WHO fp (ssd),289,0,,
+T4.ssd.WHO.fn,T4,WHO fn (ssd),14,0,,
+T4.ssd.WHO.tn,T4,WHO tn (ssd),49,0,,
+T4.ssd.WHO.sens,T4,WHO sensitivity (ssd),"83% (74, 90)",0,,
+T4.ssd.WHO.spec,T4,WHO specificity (ssd),"15% (11, 19)",0,,
+T4.bd.WHO.tp,T4,WHO tp (bd),326,0,,
+T4.bd.WHO.fp,T4,WHO fp (bd),604,0,,
+T4.bd.WHO.fn,T4,WHO fn (bd),285,0,,
+T4.bd.WHO.tn,T4,WHO tn (bd),410,0,,
+T4.bd.WHO.sens,T4,WHO sensitivity (bd),"53% (49, 57)",0,,
+T4.bd.WHO.spec,T4,WHO specificity (bd),"40% (37, 43)",0,,
+T4.ssd.IMC.tp,T4,IMC tp (ssd),80,0,,
+T4.ssd.IMC.fp,T4,IMC fp (ssd),317,0,,
+T4.ssd.IMC.fn,T4,IMC fn (ssd),3,0,,
+T4.ssd.IMC.tn,T4,IMC tn (ssd),21,0,,
+T4.ssd.IMC.sens,T4,IMC sensitivity (ssd),"96% (90, 99)",0,,
+T4.ssd.IMC.spec,T4,IMC specificity (ssd),"6% (4, 9)",0,,
+T4.bd.IMC.tp,T4,IMC tp (bd),507,0,,
+T4.bd.IMC.fp,T4,IMC fp (bd),866,0,,
+T4.bd.IMC.fn,T4,IMC fn (bd),104,0,,
+T4.bd.IMC.tn,T4,IMC tn (bd),148,0,,
+T4.bd.IMC.sens,T4,IMC sensitivity (bd),"83% (80, 86)",0,,
+T4.bd.IMC.spec,T4,IMC specificity (bd),"15% (13, 17)",0,,
+S4.children.MSF.tp,S4,MSF tp (children),95,0,,
+S4.children.MSF.fp,S4,MSF fp (children),162,0,,
+S4.children.MSF.fn,S4,MSF fn (children),44,0,,
+S4.children.MSF.tn,S4,MSF tn (children),93,0,,
+S4.children.MSF.sens,S4,MSF sensitivity (children),"68% (60, 75)",0,,
+S4.children.MSF.spec,S4,MSF specificity (children),"36% (31, 43)",0,,
+S4.children.WHO.tp,S4,WHO tp (children),127,0,,
+S4.children.WHO.fp,S4,WHO fp (children),229,0,,
+S4.children.WHO.fn,S4,WHO fn (children),12,0,,
+S4.children.WHO.tn,S4,WHO tn (children),26,0,,
+S4.children.WHO.sens,S4,WHO sensitivity (children),"91% (86, 95)",0,,
+S4.children.WHO.spec,S4,WHO specificity (children),"10% (7, 15)",0,,
+S4.children.IMC.tp,S4,IMC tp (children),135,0,,
+S4.children.IMC.fp,S4,IMC fp (children),245,0,,
+S4.children.IMC.fn,S4,IMC fn (children),4,0,,
+S4.children.IMC.tn,S4,IMC tn (children),10,0,,
+S4.children.IMC.sens,S4,IMC sensitivity (children),"97% (93, 99)",0,,
+S4.children.IMC.spec,S4,IMC specificity (children),"4% (2, 7)",0,,
+T5.ssd.k1.def,T5,"Selected definition (ssd, at least 1): Vomiting Fatigue/malaise",fatigue + vomiting,0,,Published symptom labels translated to variable names
+T5.ssd.k1.tp,T5,"tp (ssd, at least 1)",51,0,,
+T5.ssd.k1.fp,T5,"fp (ssd, at least 1)",104,0,,
+T5.ssd.k1.fn,T5,"fn (ssd, at least 1)",32,0,,
+T5.ssd.k1.tn,T5,"tn (ssd, at least 1)",234,0,,
+T5.ssd.k1.sens,T5,"sens (ssd, at least 1)","61% (51, 71)",0,,
+T5.ssd.k1.spec,T5,"spec (ssd, at least 1)","69% (64, 74)",0,,
+T5.ssd.k1.ppv,T5,"ppv (ssd, at least 1)","33% (26, 41)",0,,
+T5.ssd.k1.npv,T5,"npv (ssd, at least 1)","88% (84, 91)",0,,
+T5.ssd.k2.def,T5,"Selected definition (ssd, at least 2): Vomiting Fatigue/malaise Fever Abdominal pain Nausea Itch",abdomen_pain + fatigue + fever + itch + nausea + vomiting,0,,Published symptom labels translated to variable names
+T5.ssd.k2.tp,T5,"tp (ssd, at least 2)",50,0,,
+T5.ssd.k2.fp,T5,"fp (ssd, at least 2)",104,0,,
+T5.ssd.k2.fn,T5,"fn (ssd, at least 2)",33,0,,
+T5.ssd.k2.tn,T5,"tn (ssd, at least 2)",234,0,,
+T5.ssd.k2.sens,T5,"sens (ssd, at least 2)","60% (49, 70)",0,,
+T5.ssd.k2.spec,T5,"spec (ssd, at least 2)","69% (64, 74)",0,,
+T5.ssd.k2.ppv,T5,"ppv (ssd, at least 2)","32% (26, 40)",0,,
+T5.ssd.k2.npv,T5,"npv (ssd, at least 2)","88% (83, 91)",0,,
+T5.bd.k1.def,T5,"Selected definition (bd, at least 1): Diarrhoea Constipation Melanea Unconsciousness Dehydration",constipate_ever + diarrhea_ever + exam_dehydrate + melaena_ever + unconsc_ever,0,,Published symptom labels translated to variable names
+T5.bd.k1.tp,T5,"tp (bd, at least 1)",310,0,,
+T5.bd.k1.fp,T5,"fp (bd, at least 1)",430,0,,
+T5.bd.k1.fn,T5,"fn (bd, at least 1)",301,0,,
+T5.bd.k1.tn,T5,"tn (bd, at least 1)",584,0,,
+T5.bd.k1.sens,T5,"sens (bd, at least 1)","51% (47, 55)",0,,
+T5.bd.k1.spec,T5,"spec (bd, at least 1)","58% (55, 61)",0,,
+T5.bd.k1.ppv,T5,"ppv (bd, at least 1)","42% (38, 45)",0,,
+T5.bd.k1.npv,T5,"npv (bd, at least 1)","66% (63, 69)",0,,
+T5.bd.k2.def,T5,"Selected definition (bd, at least 2): Diarrhoea Constipation Unconsciousness Dehydration Nausea Abdominal pain",abdomen_ever + constipate_ever + diarrhea_ever + exam_dehydrate + nausea_ever + unconsc_ever,0,,Published symptom labels translated to variable names
+T5.bd.k2.tp,T5,"tp (bd, at least 2)",307,0,,
+T5.bd.k2.fp,T5,"fp (bd, at least 2)",423,0,,
+T5.bd.k2.fn,T5,"fn (bd, at least 2)",304,0,,
+T5.bd.k2.tn,T5,"tn (bd, at least 2)",591,0,,
+T5.bd.k2.sens,T5,"sens (bd, at least 2)","50% (46, 54)",0,,
+T5.bd.k2.spec,T5,"spec (bd, at least 2)","58% (55, 61)",0,,
+T5.bd.k2.ppv,T5,"ppv (bd, at least 2)","42% (39, 46)",0,,
+T5.bd.k2.npv,T5,"npv (bd, at least 2)","66% (63, 69)",0,,
+S5.children.k1.def,S5,"Selected definition (children, at least 1): Vomiting Abdominal pain Headache",abdomen_pain + head + vomiting,0,,Published symptom labels translated to variable names
+S5.children.k1.tp,S5,"tp (children, at least 1)",56,0,,
+S5.children.k1.fp,S5,"fp (children, at least 1)",99,0,,
+S5.children.k1.fn,S5,"fn (children, at least 1)",83,0,,
+S5.children.k1.tn,S5,"tn (children, at least 1)",156,0,,
+S5.children.k1.sens,S5,"sens (children, at least 1)","40% (33, 49)",0,,
+S5.children.k1.spec,S5,"spec (children, at least 1)","61% (55, 67)",0,,
+S5.children.k1.ppv,S5,"ppv (children, at least 1)","36% (29, 44)",0,,
+S5.children.k1.npv,S5,"npv (children, at least 1)","65% (59, 71)",0,,
+S5.children.k2.def,S5,"Selected definition (children, at least 2): Fever Loss of appetite",fever + loss_appetite,0,,Published symptom labels translated to variable names
+S5.children.k2.tp,S5,"tp (children, at least 2)",74,0,,
+S5.children.k2.fp,S5,"fp (children, at least 2)",111,0,,
+S5.children.k2.fn,S5,"fn (children, at least 2)",64,0,,
+S5.children.k2.tn,S5,"tn (children, at least 2)",137,0,,
+S5.children.k2.sens,S5,"sens (children, at least 2)","54% (46, 62)",0,,
+S5.children.k2.spec,S5,"spec (children, at least 2)","56% (50, 62)",0,,
+S5.children.k2.ppv,S5,"ppv (children, at least 2)","40% (33, 47)",0,,
+S5.children.k2.npv,S5,"npv (children, at least 2)","69% (62, 75)",0,,
+S6.joint.k1.def,S6,"Selected definition (joint, at least 1): Abdominal pain Fatigue/malaise",abdomen_ever + drowsy_ever,0,,Published symptom labels translated to variable names
+S6.joint.k1.tp,S6,"tp (joint, at least 1)",311,0,,
+S6.joint.k1.fp,S6,"fp (joint, at least 1)",530,0,,
+S6.joint.k1.fn,S6,"fn (joint, at least 1)",275,0,,
+S6.joint.k1.tn,S6,"tn (joint, at least 1)",930,0,,
+S6.joint.k1.sens,S6,"sens (joint, at least 1)","53% (48, 57)",1,,Percentile bootstrap CI: tolerance 1 point
+S6.joint.k1.spec,S6,"spec (joint, at least 1)","64% (61, 67)",1,,Percentile bootstrap CI: tolerance 1 point
+S6.joint.k1.ppv,S6,"ppv (joint, at least 1)","37% (34, 40)",1,,Percentile bootstrap CI: tolerance 1 point
+S6.joint.k1.npv,S6,"npv (joint, at least 1)","77% (74, 80)",1,,Percentile bootstrap CI: tolerance 1 point
+S6.joint.k2.def,S6,"Selected definition (joint, at least 2): Abdominal pain Fatigue/malaise Vomiting Anorexia/loss of appetite",abdomen_ever + appetite_ever + drowsy_ever + vomit_ever,0,,Published symptom labels translated to variable names
+S6.joint.k2.tp,S6,"tp (joint, at least 2)",301,0,,
+S6.joint.k2.fp,S6,"fp (joint, at least 2)",499,0,,
+S6.joint.k2.fn,S6,"fn (joint, at least 2)",286,0,,
+S6.joint.k2.tn,S6,"tn (joint, at least 2)",961,0,,
+S6.joint.k2.sens,S6,"sens (joint, at least 2)","51% (47, 56)",1,,Percentile bootstrap CI: tolerance 1 point
+S6.joint.k2.spec,S6,"spec (joint, at least 2)","66% (63, 69)",1,,Percentile bootstrap CI: tolerance 1 point
+S6.joint.k2.ppv,S6,"ppv (joint, at least 2)","38% (34, 41)",1,,Percentile bootstrap CI: tolerance 1 point
+S6.joint.k2.npv,S6,"npv (joint, at least 2)","77% (74, 80)",1,,Percentile bootstrap CI: tolerance 1 point
+text.abstract.prev_ssd,Abstract,IgM positive in South Sudan,20% (83 of 421),0,,
+text.abstract.prev_bd,Abstract,IgM positive in Bangladesh,38% (611 of 1625),0,,
+text.abstract.intl_sens_range,Abstract,Sensitivity range of international definitions (Table 4),53-96%,0,,
+text.abstract.intl_spec_range,Abstract,Specificity range of international definitions (Table 4),6-60%,0,,
+text.abstract.auc_ssd,Abstract,"AUC, South Sudan, symptoms","0.64 (0.57, 0.71)",0.01,,From notebook 02 cache
+text.abstract.auc_bd,Abstract,"AUC, Bangladesh, symptoms","0.60 (0.57, 0.63)",0.01,,From notebook 02 cache
+text.abstract.none_above_60_both,Abstract,No definition (shared symptoms) has sensitivity and specificity > 60% in both populations,TRUE,0,,
+text.results.flow,Results,"Patients identified (SSD, BD), excluded for onset (SSD, BD), excluded as incomplete (SSD, BD)","524, 1925, 68, 280, 35, 20",0,,Pre-exclusion counts not in analytic dataset
+text.results.prev_ssd,Results,IgM positive in South Sudan,20% (83 of 421),0,,
+text.results.prev_bd,Results,IgM positive in Bangladesh,38% (611 of 1625),0,,
+text.results.male_female_ssd,Results,"IgM positive, male vs female, South Sudan",26% versus 13%,0,,
+text.results.male_female_bd,Results,"IgM positive, male vs female, Bangladesh",40% versus 32%,0,,
+text.results.median_delay,Results,"Median days from onset to visit, South Sudan vs Bangladesh",4 days versus 14 days,0,,
+text.results.igg_neg,Results,"IgG positive among IgM negative, South Sudan vs Bangladesh",93% vs. 30%,0,,IgG not in analytic dataset: checked against Table 3
+text.results.coinfections,Results,"Malaria, HBV, HCV (SSD); HAV, HBV (BD)","9% (39 of 421), 23% (96 of 421), 1% (6 of 421), 8% (136 of 1625), 34% (555 of 1625)",0,,Co-infections (Table S1) not in analytic dataset
+text.results.msf_spec_ssd,Results,"MSF specificity, South Sudan","42% (37, 47)",0,,
+text.results.msf_spec_bd,Results,"MSF specificity, Bangladesh","17% (15, 19)",0,,
+text.results.imc_extremes,Results,IMC has the highest sensitivity and lowest specificity in both populations,TRUE,0,,
+text.results.all_misinformative_bd,Results,All international definitions misinformative in Bangladesh,TRUE,0,,
+text.results.msf_only_spec40_ssd,Results,MSF is the only informative international definition in South Sudan with specificity > 40%,TRUE,0,,
+text.results.children_who,Results,"Children: WHO has higher sensitivity and lower specificity than in older patients",TRUE,0,,
+text.results.auc_ssd_symptoms,Results,"AUC, South Sudan, symptoms","0.64 (0.57, 0.71)",0.01,,From notebook 02 cache
+text.results.auc_bd_symptoms,Results,"AUC, Bangladesh, symptoms","0.60 (0.57, 0.63)",0.01,,From notebook 02 cache
+text.results.auc_ssd_demog,Results,"AUC, South Sudan, symptoms + demographics","0.74 (0.68, 0.80)",0.01,,From notebook 02 cache
+text.results.auc_bd_demog,Results,"AUC, Bangladesh, symptoms + demographics","0.73 (0.71, 0.76)",0.01,,From notebook 02 cache
+text.results.auc_14day_similar,Results,14-day models within 0.02 AUC of the 30-day models (Figure S2),TRUE,0,,From notebook 02 cache
+text.results.auc_bd_admission,Results,"AUC, Bangladesh, symptoms on day of admission","0.60 (0.57, 0.63)",0.01,,Day-of-admission symptoms (Figure S3) not in analytic dataset
+text.results.auc_bd_admission_demog,Results,"AUC, Bangladesh, day-of-admission symptoms + demographics","0.73 (0.71, 0.76)",0.01,,Day-of-admission symptoms (Figure S3) not in analytic dataset
+text.results.auc_children_symptoms,Results,"AUC, children, symptoms","0.54 (0.48, 0.60)",0.01,,From notebook 02 cache
+text.results.auc_children_demog,Results,"AUC, children, symptoms + demographics","0.60 (0.54, 0.66)",0.01,,From notebook 02 cache
+text.results.t5_more_specific,Results,Every Table 5 definition is more specific than every international definition in its population,TRUE,0,,
+text.results.t5_below_70_ssd,Results,"Table 5, South Sudan: sensitivity and specificity below 70%",TRUE,0,,
+text.results.t5_below_60_bd,Results,"Table 5, Bangladesh: sensitivity and specificity below 60%",TRUE,0,,
+text.results.s5_below_65,Results,"Table S5: sensitivity and specificity below 65%",TRUE,0,,
+text.results.s5_ppv_range,Results,"Children: positive predictive values of Table S5 definitions",65-69%,0,,
+text.results.t5_ssd_ppv,Results,"Older patients, South Sudan: positive predictive value of Table 5 definitions",88%,0,,
+text.results.joint_none_above_60,Results,"Combined: no definition with sensitivity and specificity > 60%",TRUE,0,,
+text.discussion.intl_sens_range,Discussion,Sensitivity range of international definitions (Table 4),53-96%,0,,
+text.discussion.intl_spec_range,Discussion,Specificity range of international definitions (Table 4),6-60%,0,,
+text.discussion.npv_example,Discussion,"Combined: NPV of acute jaundice plus abdominal pain or fatigue/malaise","77% (74, 80)",1,,Percentile bootstrap CI: tolerance 1 point
+text.limitations.outpatients,Discussion,South Sudan patients who were outpatients,93%,0,,Hospitalisation not in analytic dataset
+text.limitations.dark_urine,Discussion,"Dark urine without yellowing; of these meeting MSF, IMC","100, 36, 94",0,,Jaundice signs not in analytic dataset
+text.limitations.msf_restricted,Discussion,"MSF sensitivity and specificity, dark-urine-only patients excluded","71% (61, 80), 41% (47, 58)",0,,Jaundice signs not in analytic dataset
+text.limitations.imc_restricted,Discussion,"IMC sensitivity and specificity, dark-urine-only patients excluded","93% (85, 97), 33% (28, 38)",0,,Jaundice signs not in analytic dataset
+text.limitations.median_delay,Discussion,"Median delay, Bangladesh and South Sudan","14, 4",0,,
+text.limitations.concordance,Discussion,ELISA/PCR concordance in South Sudan,95%,0,,PCR not in analytic dataset
