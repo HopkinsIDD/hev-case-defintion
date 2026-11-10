@@ -27,16 +27,9 @@ populations <- list(
   Bangladesh = list(dat = load_bd(binary = TRUE), symptoms = BD_SYMPTOMS)
 )
 
-# Sensitivity/specificity thresholds used when selecting definitions
-thresholds <- tribble(
-  ~population,            ~min_k, ~threshold,
-  "South Sudan",               1,        0.6,
-  "South Sudan",               2,        0.6,
-  "South Sudan children",      1,        0.4,
-  "South Sudan children",      2,        0.5,
-  "Bangladesh",                1,        0.5,
-  "Bangladesh",                2,        0.5
-)
+# Sensitivity/specificity thresholds used when selecting definitions (R/combos.R)
+thresholds <- filter(SELECTION_THRESHOLDS, population != "Combined")
+thresholds
 ```
 
 ```{r search}

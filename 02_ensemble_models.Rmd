@@ -12,6 +12,8 @@ and **Figure S4** (children under 14, South Sudan), and the AUCs quoted in the R
 takes several hours (most of it Bangladesh, n = 1,625). To run faster, knit with
 `rmarkdown::render("02_ensemble_models.Rmd", params = list(cores = 8))`; results then
 differ slightly in the third decimal place from the sequential run (see `R/ensemble.R`).
+When running in parallel, start R with `OMP_NUM_THREADS=1` and `VECLIB_MAXIMUM_THREADS=1`
+so each worker uses one thread; otherwise the workers compete for cores.
 
 Not reproduced here: Figure S3 (Bangladesh symptoms on the day of admission), because
 that variable is not in the analytic dataset.
@@ -22,6 +24,10 @@ library(here)
 library(cowplot)
 source(here("R", "data.R"))
 source(here("R", "ensemble.R"))
+
+# Parallel workers only get reproducible random-number streams with this generator.
+# Results then depend on `cores`, so report it alongside the AUCs.
+if (params$cores > 1) RNGkind("L'Ecuyer-CMRG")
 
 ssd <- load_ssd() %>% select(-all_of(SSD_RARE_SYMPTOMS))
 ssd_children <- load_ssd(children = TRUE) %>% select(-all_of(SSD_RARE_SYMPTOMS))
@@ -58,6 +64,8 @@ ssd_kids <- run_ensembles(ssd_children, SSD_DEMOGRAPHICS, "South Sudan children"
 ```{r auc}
 aucs <- bind_rows(ssd_30$auc, bd_30$auc, ssd_14$auc, bd_14$auc, ssd_kids$auc)
 aucs %>% mutate(across(c(auc, lower, upper), ~ round(., 2)))
+# Cache for audit/audit.R, which checks the AUCs quoted in the paper without refitting
+write.csv(aucs, here("audit", "ensemble_aucs.csv"), row.names = FALSE)
 ```
 
 ## Figures

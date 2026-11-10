@@ -25,7 +25,7 @@ count(joint, dataset, infect_bin)
 ```
 
 ```{r search}
-threshold <- 0.5
+threshold <- unique(filter(SELECTION_THRESHOLDS, population == "Combined")$threshold)   # 0.5
 joint_results <- lapply(c(at_least_1 = 1, at_least_2 = 2), function(k) {
   evaluate_case_defs(joint, JOINT_SYMPTOMS, min_k = k, weights = joint$weight)
 })
