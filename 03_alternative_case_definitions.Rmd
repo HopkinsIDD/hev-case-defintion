@@ -3,7 +3,7 @@ title: "Alternative case definitions (exhaustive search)"
 output: html_document
 ---
 
-Reproduces **Table 5** (aged 14 and over) and **Table S5** (children under 14, South
+Reproduces **Table 5** (aged 14 and over), **Table S6** (aged 14 and over with confirmed hepatitis E defined by the presence of HEV RNA, South Sudan) and **Table S7** (children under 14, South
 Sudan). Every combination of signs/symptoms is evaluated as "acute jaundice and at
 least one" or "at least two" of the listed symptoms.
 
@@ -21,8 +21,14 @@ source(here("R", "data.R"))
 source(here("R", "metrics.R"))
 source(here("R", "combos.R"))
 
+ssd <- load_ssd(binary = TRUE) 
+
+ssd_pcr <- make_ssd(ssd, "baseline_pcr_result")
+ssd_igm <- make_ssd(ssd, "baseline_igm_result")
+
 populations <- list(
-  `South Sudan` = list(dat = load_ssd(binary = TRUE), symptoms = SSD_SYMPTOMS),
+  `South Sudan` = list(dat = ssd_igm, symptoms = SSD_SYMPTOMS),
+  `South Sudan PCR` = list(dat = ssd_pcr, symptoms = SSD_SYMPTOMS),
   `South Sudan children` = list(dat = load_ssd(children = TRUE, binary = TRUE), symptoms = SSD_SYMPTOMS),
   Bangladesh = list(dat = load_bd(binary = TRUE), symptoms = BD_SYMPTOMS)
 )
@@ -44,7 +50,7 @@ results <- thresholds %>%
 results %>% select(population, min_k, n_defs, n_informative)
 ```
 
-## Table 5 and Table S5
+## Table 5 and Table S7 and Table S8
 
 ```{r selected}
 selected <- results %>%

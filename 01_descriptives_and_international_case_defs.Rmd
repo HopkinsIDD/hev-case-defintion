@@ -5,7 +5,7 @@ output: html_document
 
 Reproduces the parts of **Table 3**, **Table S2** and **Table S3** that come from the
 analytic datasets, **Figure S1**, **Table 4** (international case definitions, patients
-aged 14 and over) and **Table S4** (children under 14 in South Sudan).
+aged 14 and over) **Table S4** (patients aged 14 and over with confirmed hepatitis E defined by the presence of HEV RNA in South Sudan) and **Table S5** (children under 14 in South Sudan).
 
 ```{r setup, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -14,6 +14,9 @@ source(here("R", "data.R"))
 source(here("R", "metrics.R"))
 
 ssd <- load_ssd(binary = TRUE)
+ssd_pcr <- make_ssd(ssd, "baseline_pcr_result")
+ssd <- make_ssd(ssd, "baseline_igm_result")
+
 ssd_children <- load_ssd(children = TRUE, binary = TRUE)
 bd <- load_bd(binary = TRUE)
 ```
@@ -109,7 +112,13 @@ international_table(ssd, INTERNATIONAL_DEFS$ssd)
 international_table(bd, INTERNATIONAL_DEFS$bd)
 ```
 
-## Table S4: international case definitions (children under 14, South Sudan)
+## Table S6: international case definitions (aged 14 and over, confirmed hepatitis E based on PCR results, South Sudan)
+
+```{r table sx}
+international_table(ssd_pcr, INTERNATIONAL_DEFS$ssd)
+```
+
+## Table S7: international case definitions (children under 14, South Sudan)
 
 ```{r tableS4}
 international_table(ssd_children, INTERNATIONAL_DEFS$ssd)

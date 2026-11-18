@@ -68,6 +68,8 @@ SELECTION_THRESHOLDS <- tribble(
   ~population,            ~min_k, ~threshold,
   "South Sudan",               1,        0.6,
   "South Sudan",               2,        0.6,
+  "South Sudan PCR",           1,        0.6,
+  "South Sudan PCR",           2,        0.6,
   "South Sudan children",      1,        0.4,
   "South Sudan children",      2,        0.5,
   "Bangladesh",                1,        0.5,
