@@ -58,6 +58,14 @@ load_ssd <- function(children = FALSE, binary = FALSE) {
   dat
 }
 
+#' Create a separate dataset for sensitivity analyses in South Sudan data focused on PCR-positive patients only
+make_ssd <- function(data, result_var) {
+  data %>%
+    mutate(infect_bin = as.numeric(.data[[result_var]])) %>%
+    select(-baseline_igm_result, -baseline_pcr_result)
+}
+
+
 #' Load Bangladesh data.
 load_bd <- function(binary = FALSE) {
   dat <- readRDS(here("dat_bd_adjusted.rds"))
