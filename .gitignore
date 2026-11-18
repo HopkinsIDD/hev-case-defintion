@@ -2,3 +2,5 @@ batches/
 *.html
 .Rproj.user/
 .Rhistory
+audit/audit_results.csv
+audit/consistency_results.csv

@@ -62,6 +62,20 @@ evaluate_case_defs <- function(dat, symptoms, min_k = 1, weights = NULL, chunk =
     )
 }
 
+# Sensitivity/specificity thresholds used to select the definitions reported in
+# Table 5, Table S5 and Table S6 (see select_case_defs()).
+SELECTION_THRESHOLDS <- tribble(
+  ~population,            ~min_k, ~threshold,
+  "South Sudan",               1,        0.6,
+  "South Sudan",               2,        0.6,
+  "South Sudan children",      1,        0.4,
+  "South Sudan children",      2,        0.5,
+  "Bangladesh",                1,        0.5,
+  "Bangladesh",                2,        0.5,
+  "Combined",                  1,        0.5,
+  "Combined",                  2,        0.5
+)
+
 #' Pick the alternative case definition(s) to report.
 #'
 #' Among informative definitions with sensitivity AND specificity above

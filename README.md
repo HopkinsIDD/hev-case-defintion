@@ -16,12 +16,34 @@ R/
 03_alternative_case_definitions.Rmd               Table 5, Table S5
 04_combined_populations.Rmd                       Table S6, Figure S5, Discussion NPV
 dat_*.rds                                         analytic datasets
+audit/
+  audit.R                recompute every number in the paper and compare with the published value
+  published_values.csv   every published number, one row each, with its table/section
+  ensemble_aucs.csv      AUC cache written by notebook 02
 ```
 
 Open the folder as an RStudio project (or knit from the repo root); all paths go
 through `here()`. Notebooks 01, 03 and 04 each knit in under a minute. Notebook 02
 refits the ensemble once per patient and takes several hours sequentially; see the
 note at the top of that file for running it in parallel.
+
+## Checking the manuscript
+
+```
+Rscript audit/audit.R
+```
+
+The audit takes about 10 seconds. It recomputes each number in `audit/published_values.csv`
+from the datasets, using the functions in `R/`, and marks it PASS, FAIL, NOT IN DATA
+(the number needs data that isn't in this repository, such as IgG or co-infections) or
+NOT RUN (the AUC cache is missing). It also checks the published numbers against each
+other: estimates inside their CIs, percentages matching their counts, and 2x2 margins
+matching the group sizes. Results go to `audit/audit_results.csv` and
+`audit/consistency_results.csv`.
+
+When the manuscript changes, update the `published` column of `audit/published_values.csv`
+and rerun the audit. The AUCs are read from `audit/ensemble_aucs.csv` rather than refitted;
+rerun notebook 02 to refresh it.
 
 ## Data
 
