@@ -46,7 +46,8 @@ computed <- list()        # id -> numeric vector (percentages on 0-100 scale), l
 not_run <- character()    # ids that need a cache that does not exist
 put <- function(id, value) computed[[id]] <<- value
 
-ssd <- load_ssd(binary = TRUE)
+ssd <- load_ssd(binary = TRUE)                        # reference test: IgM
+ssd_pcr <- load_ssd(binary = TRUE, outcome = "pcr")   # reference test: PCR
 ssd_children <- load_ssd(children = TRUE, binary = TRUE)
 bd <- load_bd(binary = TRUE)
 joint <- load_joint()
@@ -151,53 +152,71 @@ put_selected <- function(sel, prefix, ci) {
   }
 }
 
+# Every population in CASE_DEF_ANALYSES except "Combined" (handled below) must
+# be registered here; the PCR analysis ("SPCR") has no published_values.csv
+# entries yet, so its ids are reported as computed-but-unregistered.
 POPULATIONS <- list(
   `South Sudan` = list(dat = ssd, symptoms = SSD_SYMPTOMS, prefix = "T5.ssd"),
+  `South Sudan PCR` = list(dat = ssd_pcr, symptoms = SSD_SYMPTOMS, prefix = "SPCR.ssd"),
   `South Sudan children` = list(dat = ssd_children, symptoms = SSD_SYMPTOMS, prefix = "S5.children"),
   Bangladesh = list(dat = bd, symptoms = BD_SYMPTOMS, prefix = "T5.bd")
 )
+single <- filter(CASE_DEF_ANALYSES, population != "Combined")
+missing_pop <- setdiff(single$population, names(POPULATIONS))
+if (length(missing_pop)) stop("Not registered in POPULATIONS: ", paste(missing_pop, collapse = ", "))
 selected <- list()
-for (i in seq_len(nrow(SELECTION_THRESHOLDS))) {
-  th <- SELECTION_THRESHOLDS[i, ]
-  if (th$population == "Combined") next
-  p <- POPULATIONS[[th$population]]
-  sel <- select_case_defs(evaluate_case_defs(p$dat, p$symptoms, th$min_k), th$threshold) %>% add_wilson_ci()
-  prefix <- paste0(p$prefix, ".k", th$min_k)
+selection_log <- list()
+for (i in seq_len(nrow(single))) {
+  a <- single[i, ]
+  p <- POPULATIONS[[a$population]]
+  sel <- select_case_defs(evaluate_case_defs(p$dat, p$symptoms, a$min_k)) %>% add_wilson_ci()
+  prefix <- paste0(p$prefix, ".k", a$min_k)
   put_selected(sel, prefix, sel)
   selected[[prefix]] <- sel
+  selection_log[[prefix]] <- data.frame(prefix = prefix, threshold = sel$threshold, case_def = sel$case_def)
 }
 
 joint_results <- lapply(c(k1 = 1, k2 = 2), function(k)
   evaluate_case_defs(joint, JOINT_SYMPTOMS, min_k = k, weights = joint$weight))
 set.seed(123)
 for (k in 1:2) {
-  th <- SELECTION_THRESHOLDS %>% filter(population == "Combined", min_k == k)
-  sel <- select_case_defs(joint_results[[k]], th$threshold)
+  sel <- select_case_defs(joint_results[[k]])
+  selection_log[[paste0("S6.joint.k", k)]] <- data.frame(prefix = paste0("S6.joint.k", k),
+                                                       threshold = sel$threshold, case_def = sel$case_def)
   ci <- bootstrap_case_defs(joint, JOINT_SYMPTOMS, k, sel$id)
   put_selected(sel, paste0("S6.joint.k", k), ci)
 }
 
 # Ensemble AUCs (cached by 02_ensemble_models.Rmd) -----------------------------
 
+# Key: population | reference_test | time_window | predictor_set
+SYM <- "Signs/symptoms"; DEM <- "Signs/symptoms plus demographics"
 auc_ids <- c(
-  text.abstract.auc_ssd = "South Sudan, <=30 days|Signs/symptoms",
-  text.abstract.auc_bd = "Bangladesh, <=30 days|Signs/symptoms",
-  text.results.auc_ssd_symptoms = "South Sudan, <=30 days|Signs/symptoms",
-  text.results.auc_bd_symptoms = "Bangladesh, <=30 days|Signs/symptoms",
-  text.results.auc_ssd_demog = "South Sudan, <=30 days|Signs/symptoms plus demographics",
-  text.results.auc_bd_demog = "Bangladesh, <=30 days|Signs/symptoms plus demographics",
-  text.results.auc_children_symptoms = "South Sudan children|Signs/symptoms",
-  text.results.auc_children_demog = "South Sudan children|Signs/symptoms plus demographics"
+  text.abstract.auc_ssd = paste("South Sudan|IgM|<=30 days", SYM, sep = "|"),
+  text.abstract.auc_bd = paste("Bangladesh|IgM|<=30 days", SYM, sep = "|"),
+  text.results.auc_ssd_symptoms = paste("South Sudan|IgM|<=30 days", SYM, sep = "|"),
+  text.results.auc_bd_symptoms = paste("Bangladesh|IgM|<=30 days", SYM, sep = "|"),
+  text.results.auc_ssd_demog = paste("South Sudan|IgM|<=30 days", DEM, sep = "|"),
+  text.results.auc_bd_demog = paste("Bangladesh|IgM|<=30 days", DEM, sep = "|"),
+  text.results.auc_children_symptoms = paste("South Sudan children|IgM|<=30 days", SYM, sep = "|"),
+  text.results.auc_children_demog = paste("South Sudan children|IgM|<=30 days", DEM, sep = "|")
 )
 auc_file <- here("audit", "ensemble_aucs.csv")
 if (file.exists(auc_file)) {
   aucs <- read.csv(auc_file)
-  key <- paste(aucs$population, aucs$model, sep = "|")
-  auc_of <- function(k) unlist(aucs[key == k, c("auc", "lower", "upper")])
+  key_cols <- c("population", "reference_test", "time_window", "predictor_set")
+  if (!all(key_cols %in% names(aucs))) stop(auc_file, " lacks columns: ", paste(setdiff(key_cols, names(aucs)), collapse = ", "),
+                                           ". Rerun 02_ensemble_models.Rmd.")
+  key <- do.call(paste, c(aucs[key_cols], sep = "|"))
+  if (anyDuplicated(key)) stop("Duplicate AUC keys in ", auc_file, ": ", paste(unique(key[duplicated(key)]), collapse = "; "))
+  auc_of <- function(k) {
+    if (sum(key == k) != 1) stop("Expected exactly one AUC row for ", k, ", found ", sum(key == k))
+    unlist(aucs[key == k, c("auc", "lower", "upper")])
+  }
   for (id in names(auc_ids)) put(id, unname(auc_of(auc_ids[[id]])))
   diff_14 <- sapply(c("South Sudan", "Bangladesh"), function(s)
-    sapply(c("Signs/symptoms", "Signs/symptoms plus demographics"), function(m)
-      auc_of(paste0(s, ", <=14 days|", m))[1] - auc_of(paste0(s, ", <=30 days|", m))[1]))
+    sapply(c(SYM, DEM), function(m)
+      auc_of(paste(s, "IgM", "<=14 days", m, sep = "|"))[1] - auc_of(paste(s, "IgM", "<=30 days", m, sep = "|"))[1]))
   put("text.results.auc_14day_similar", all(abs(diff_14) <= 0.02))
 } else {
   not_run <- c(names(auc_ids), "text.results.auc_14day_similar")
@@ -254,8 +273,8 @@ below <- function(prefixes, limit)
 put("text.results.t5_below_70_ssd", below(c("T5.ssd.k1", "T5.ssd.k2"), 0.7))
 put("text.results.t5_below_60_bd", below(c("T5.bd.k1", "T5.bd.k2"), 0.6))
 put("text.results.s5_below_65", below(c("S5.children.k1", "S5.children.k2"), 0.65))
-put("text.results.s5_ppv_range", 100 * range(sel_metric(c("S5.children.k1", "S5.children.k2"), "ppv")))
-put("text.results.t5_ssd_ppv", 100 * selected[["T5.ssd.k1"]]$ppv)
+put("text.results.s5_npv_range", 100 * range(sel_metric(c("S5.children.k1", "S5.children.k2"), "npv")))
+put("text.results.t5_ssd_npv", 100 * selected[["T5.ssd.k1"]]$npv)
 put("text.results.joint_none_above_60",
     !any(sapply(joint_results, function(r) any(r$sensitivity > 0.6 & r$specificity > 0.6))))
 put("text.discussion.npv_example", computed[["S6.joint.k1.npv"]])
@@ -369,6 +388,9 @@ consistency <- do.call(rbind, checks)
 
 write.csv(results, here("audit", "audit_results.csv"), row.names = FALSE)
 write.csv(consistency, here("audit", "consistency_results.csv"), row.names = FALSE)
+
+cat("\n== Selection thresholds (highest feasible joint threshold, R/combos.R)\n\n")
+print(do.call(rbind, selection_log), row.names = FALSE)
 
 cat("\n== Published numbers vs recomputed values\n\n")
 print(as.data.frame.matrix(table(factor(results$source, unique(results$source)),

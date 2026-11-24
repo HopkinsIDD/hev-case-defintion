@@ -42,23 +42,7 @@ format_performance <- function(perf) {
   out
 }
 
-# Existing international case definitions (WHO hepatitis E outbreak toolbox).
-# Every patient has acute jaundice, so each reduces to "any of these symptoms".
-# Malaise is recorded as fatigue (SSD) / drowsiness (BD). Epigastric pain and
-# joint pain were not collected in Bangladesh; right upper quadrant tenderness
-# was not collected in either population.
-INTERNATIONAL_DEFS <- list(
-  ssd = list(
-    MSF = c("fatigue", "epigastric_pain", "nausea", "loss_appetite"),
-    WHO = c("fatigue", "fever"),
-    IMC = c("fatigue", "loss_appetite", "fever", "abdomen_pain", "joint_pains")
-  ),
-  bd = list(
-    MSF = c("drowsy_ever", "nausea_ever", "appetite_ever"),
-    WHO = c("drowsy_ever", "fever_ever"),
-    IMC = c("drowsy_ever", "appetite_ever", "fever_ever", "abdomen_ever")
-  )
-)
+# INTERNATIONAL_DEFS is defined in R/data.R (source it first).
 
 #' Sensitivity/specificity table for the international case definitions.
 #' `dat` must have 0/1 symptom columns (load with `binary = TRUE`).

@@ -13,9 +13,8 @@ library(here)
 source(here("R", "data.R"))
 source(here("R", "metrics.R"))
 
-ssd <- load_ssd(binary = TRUE)
-ssd_pcr <- make_ssd(ssd, "baseline_pcr_result")
-ssd <- make_ssd(ssd, "baseline_igm_result")
+ssd <- load_ssd(binary = TRUE)                       # reference test: IgM
+ssd_pcr <- load_ssd(binary = TRUE, outcome = "pcr")  # reference test: PCR
 
 ssd_children <- load_ssd(children = TRUE, binary = TRUE)
 bd <- load_bd(binary = TRUE)

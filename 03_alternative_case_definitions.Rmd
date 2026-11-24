@@ -7,12 +7,13 @@ Reproduces **Table 5** (aged 14 and over), **Table S6** (aged 14 and over with c
 Sudan). Every combination of signs/symptoms is evaluated as "acute jaundice and at
 least one" or "at least two" of the listed symptoms.
 
-**Selection rule.** Among informative definitions (sensitivity + specificity > 1)
-whose sensitivity and specificity both exceed a threshold, report the one with the
-highest specificity, breaking ties by sensitivity and then by fewest symptoms. The
-thresholds below are the ones used for the manuscript. Without a threshold, the
-highest-specificity informative definition is a single rare symptom such as itch,
-with about 4% sensitivity.
+**Selection rule.** For each population and rule, find the highest joint threshold
+(10%, 20%, ..., 90%) that at least one informative definition (sensitivity +
+specificity > 1) exceeds on both sensitivity and specificity. Among the definitions
+above that threshold, report the one with the highest specificity, breaking ties by
+sensitivity and then by fewest symptoms. The threshold used is shown next to each
+selected definition. Without a threshold, the highest-specificity informative
+definition is a single rare symptom such as itch, with about 4% sensitivity.
 
 ```{r setup, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -21,10 +22,8 @@ source(here("R", "data.R"))
 source(here("R", "metrics.R"))
 source(here("R", "combos.R"))
 
-ssd <- load_ssd(binary = TRUE) 
-
-ssd_pcr <- make_ssd(ssd, "baseline_pcr_result")
-ssd_igm <- make_ssd(ssd, "baseline_igm_result")
+ssd_igm <- load_ssd(binary = TRUE)                       # reference test: IgM
+ssd_pcr <- load_ssd(binary = TRUE, outcome = "pcr")      # reference test: PCR
 
 populations <- list(
   `South Sudan` = list(dat = ssd_igm, symptoms = SSD_SYMPTOMS),
@@ -33,21 +32,21 @@ populations <- list(
   Bangladesh = list(dat = load_bd(binary = TRUE), symptoms = BD_SYMPTOMS)
 )
 
-# Sensitivity/specificity thresholds used when selecting definitions (R/combos.R)
-thresholds <- filter(SELECTION_THRESHOLDS, population != "Combined")
-thresholds
+# Populations and rules analysed here (the combined analysis is notebook 04)
+analyses <- filter(CASE_DEF_ANALYSES, population != "Combined")
 ```
 
 ```{r search}
-results <- thresholds %>%
+results <- analyses %>%
   rowwise() %>%
   mutate(all_defs = list(evaluate_case_defs(populations[[population]]$dat,
                                             populations[[population]]$symptoms, min_k)),
          n_defs = nrow(all_defs),
-         n_informative = sum(all_defs$informative)) %>%
+         n_informative = sum(all_defs$informative),
+         threshold = highest_threshold(all_defs)) %>%
   ungroup()
 
-results %>% select(population, min_k, n_defs, n_informative)
+results %>% select(population, min_k, n_defs, n_informative, threshold)
 ```
 
 ## Table 5 and Table S7 and Table S8

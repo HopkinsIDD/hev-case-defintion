@@ -62,36 +62,47 @@ evaluate_case_defs <- function(dat, symptoms, min_k = 1, weights = NULL, chunk =
     )
 }
 
-# Sensitivity/specificity thresholds used to select the definitions reported in
-# Table 5, Table S5 and Table S6 (see select_case_defs()).
-SELECTION_THRESHOLDS <- tribble(
-  ~population,            ~min_k, ~threshold,
-  "South Sudan",               1,        0.6,
-  "South Sudan",               2,        0.6,
-  "South Sudan PCR",           1,        0.6,
-  "South Sudan PCR",           2,        0.6,
-  "South Sudan children",      1,        0.4,
-  "South Sudan children",      2,        0.5,
-  "Bangladesh",                1,        0.5,
-  "Bangladesh",                2,        0.5,
-  "Combined",                  1,        0.5,
-  "Combined",                  2,        0.5
-)
+# Selecting the definition to report ------------------------------------------
+#
+# Methods: candidate definitions are evaluated against increasing joint
+# performance thresholds (sensitivity AND specificity above 10%, 20%, ...,
+# 90%). The threshold used is the highest one that at least one informative
+# definition clears; among those definitions we take the highest specificity,
+# then the highest sensitivity, then the fewest symptoms.
+#
+# Without a threshold, the "best" definition is a single rare symptom with
+# near-100% specificity and near-0% sensitivity.
+
+SELECTION_GRID <- seq(9, 1) / 10   # 0.9, 0.8, ..., 0.1 (exact decimals)
+
+# Analyses for which an alternative definition is selected
+CASE_DEF_ANALYSES <- expand.grid(
+  min_k = 1:2,
+  population = c("South Sudan", "South Sudan PCR", "South Sudan children", "Bangladesh", "Combined"),
+  stringsAsFactors = FALSE
+)[, c("population", "min_k")]
+
+#' Highest grid threshold that some informative definition exceeds on both
+#' sensitivity and specificity. Comparisons use unrounded proportions.
+highest_threshold <- function(results, grid = SELECTION_GRID) {
+  ok <- vapply(grid, function(t)
+    any(results$informative & results$sensitivity > t & results$specificity > t), logical(1))
+  if (!any(ok)) stop("No informative definition exceeds any threshold in the grid")
+  max(grid[ok])
+}
 
 #' Pick the alternative case definition(s) to report.
 #'
 #' Among informative definitions with sensitivity AND specificity above
-#' `threshold`, take the highest specificity; break ties by highest
-#' sensitivity, then fewest symptoms.
-#'
-#' Without the threshold, the "best" definition is a single rare symptom with
-#' near-100% specificity and near-0% sensitivity, so the threshold matters and
-#' must be reported in the methods.
-select_case_defs <- function(results, threshold, n = 1) {
+#' `threshold` (by default the highest feasible one, see highest_threshold()),
+#' take the highest specificity; break ties by highest sensitivity, then fewest
+#' symptoms. The threshold used is returned in the `threshold` column.
+select_case_defs <- function(results, threshold = highest_threshold(results), n = 1) {
   results %>%
     filter(informative, sensitivity > threshold, specificity > threshold) %>%
     arrange(desc(specificity), desc(sensitivity), n_symptoms) %>%
-    head(n)
+    head(n) %>%
+    mutate(threshold = threshold)
 }
 
 #' Add Wilson CIs (unweighted analyses) to selected definitions.

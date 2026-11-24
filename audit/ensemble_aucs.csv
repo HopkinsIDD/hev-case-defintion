@@ -1,11 +1,13 @@
-population,model,auc,lower,upper
-"South Sudan, <=30 days",Signs/symptoms,0.64,0.57,0.71
-"South Sudan, <=30 days",Signs/symptoms plus demographics,0.73,0.67,0.79
-"Bangladesh, <=30 days",Signs/symptoms,0.60,0.57,0.62
-"Bangladesh, <=30 days",Signs/symptoms plus demographics,0.73,0.71,0.76
-"South Sudan, <=14 days",Signs/symptoms,0.63,0.55,0.70
-"South Sudan, <=14 days",Signs/symptoms plus demographics,0.73,0.67,0.80
-"Bangladesh, <=14 days",Signs/symptoms,0.61,0.57,0.65
-"Bangladesh, <=14 days",Signs/symptoms plus demographics,0.73,0.69,0.76
-South Sudan children,Signs/symptoms,0.53,0.47,0.59
-South Sudan children,Signs/symptoms plus demographics,0.61,0.55,0.67
+"population","reference_test","time_window","predictor_set","auc","lower","upper"
+"South Sudan","IgM","<=30 days","Signs/symptoms",0.636451129963641,0.566117131246881,0.703434447850574
+"South Sudan","IgM","<=30 days","Signs/symptoms plus demographics",0.743601625436659,0.685214229699865,0.799034005845869
+"Bangladesh","IgM","<=30 days","Signs/symptoms",0.595762435558482,0.56702660300797,0.623152824451137
+"Bangladesh","IgM","<=30 days","Signs/symptoms plus demographics",0.735154643501617,0.711445208972907,0.760168443751473
+"South Sudan","IgM","<=14 days","Signs/symptoms",0.628233719892953,0.553473461195361,0.705578724353255
+"South Sudan","IgM","<=14 days","Signs/symptoms plus demographics",0.739116859946476,0.675868644067797,0.802191123996432
+"Bangladesh","IgM","<=14 days","Signs/symptoms",0.609668554404079,0.569832800400663,0.64630687290519
+"Bangladesh","IgM","<=14 days","Signs/symptoms plus demographics",0.733225462624084,0.698353366465051,0.767291257335851
+"South Sudan","PCR","<=30 days","Signs/symptoms",0.662028838856565,0.587650729403828,0.733000252972425
+"South Sudan","PCR","<=30 days","Signs/symptoms plus demographics",0.714351968968717,0.64203874694325,0.786240408128847
+"South Sudan children","IgM","<=30 days","Signs/symptoms",0.529496402877697,0.473860911270983,0.591225842855127
+"South Sudan children","IgM","<=30 days","Signs/symptoms plus demographics",0.618084356044575,0.559061926929045,0.676402877697841
