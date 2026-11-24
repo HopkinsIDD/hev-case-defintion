@@ -1,0 +1,48 @@
+run_date: 2026-11-24 14:46:06 UTC
+git_commit: d0fe7d58cbb052d02f36129c5a85792921bb229d
+seeds: South Sudan 1234, Bangladesh 12345, children 1234
+rng_kind: L'Ecuyer-CMRG, Inversion, Rejection
+cores: 8
+data_md5: dat_ssd_adjusted.rds b72158ac9981f03da55ea5a5b7b80bfe
+data_md5: dat_ssd_adjusted_children.rds 378d3801823572397b51f0768a4fa5b5
+data_md5: dat_bd_adjusted.rds 1cab890887d3960e042f25bf5875261d
+
+R version 4.5.3 (2026-03-11)
+Platform: aarch64-apple-darwin20
+Running under: macOS Tahoe 26.5.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+Random number generation:
+ RNG:     L'Ecuyer-CMRG 
+ Normal:  Inversion 
+ Sample:  Rejection 
+ 
+locale:
+[1] C.UTF-8/C.UTF-8/C.UTF-8/C/C.UTF-8/C.UTF-8
+
+time zone: Europe/Zurich
+tzcode source: internal
+
+attached base packages:
+[1] splines   stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+[1] ggplot2_4.0.3       pROC_1.19.1         SuperLearner_2.0-42
+[4] nnls_1.6            gam_1.22-7          foreach_1.5.2      
+[7] dplyr_1.2.1         cowplot_1.2.0       here_1.0.2         
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.3     Rcpp_1.1.1-1.1    
+ [5] tidyselect_1.2.1   parallel_4.5.3     jquerylib_0.1.4    scales_1.4.0      
+ [9] yaml_2.3.12        fastmap_1.2.0      R6_2.6.1           generics_0.1.4    
+[13] knitr_1.51         iterators_1.0.14   tibble_3.3.1       rprojroot_2.1.1   
+[17] bslib_0.10.0       pillar_1.11.1      RColorBrewer_1.1-3 rlang_1.2.0       
+[21] cachem_1.1.0       xfun_0.57          sass_0.4.10        S7_0.2.2          
+[25] otel_0.2.0         cli_3.6.6          withr_3.0.2        magrittr_2.0.5    
+[29] digest_0.6.39      grid_4.5.3         lifecycle_1.0.5    vctrs_0.7.3       
+[33] evaluate_1.0.5     glue_1.8.1         farver_2.1.2       codetools_0.2-20  
+[37] rmarkdown_2.31     tools_4.5.3        pkgconfig_2.0.3    htmltools_0.5.9   
