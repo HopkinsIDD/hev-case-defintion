@@ -13,6 +13,7 @@ R/
   ensemble.R   SuperLearner leave-one-out AUCs and ROC plots
 01_descriptives_and_international_case_defs.Rmd   Tables 3, S2, S3 (data-derived rows), Figure S1, Tables 4, S4
 02_ensemble_models.Rmd                            Figure 1, Figure S2, Figure S4 and their AUCs
+export_roc_figures.R                              PNGs of Figure 1, S2, S3, S5 from saved predictions (figures/)
 03_alternative_case_definitions.Rmd               Table 5, Table S5
 04_combined_populations.Rmd                       Table S6, Figure S5, Discussion NPV
 dat_*.rds                                         analytic datasets

@@ -41,6 +41,16 @@ loocv_predictions <- function(dat, cores = 1) {
   }
 }
 
+#' ROC object with the direction fixed: higher prediction = HEV positive.
+fixed_roc <- function(y, pred) roc(y, pred, levels = c(0, 1), direction = "<", quiet = TRUE)
+
+#' ROC curve points (one row per threshold) for plot_roc(), from held-out
+#' predictions such as those saved in audit/ensemble_predictions.csv.
+roc_points <- function(y, pred) {
+  r <- fixed_roc(y, pred)
+  data.frame(fpr = 1 - r$specificities, tpr = r$sensitivities)
+}
+
 #' AUC with a 2,000-sample stratified percentile bootstrap CI, plus ROC curve
 #' points, all from one pROC object.
 #'
@@ -48,7 +58,7 @@ loocv_predictions <- function(dat, cores = 1) {
 #' (controls = 0, cases = 1). pROC's default would otherwise pick whichever
 #' direction gives AUC >= 0.5, hiding a model that ranks patients backwards.
 auc_summary <- function(y, pred, predictor_set, boot.n = 2000) {
-  roc_obj <- roc(y, pred, levels = c(0, 1), direction = "<", quiet = TRUE)
+  roc_obj <- fixed_roc(y, pred)
   ci <- ci.auc(roc_obj, method = "bootstrap", boot.n = boot.n, boot.stratified = TRUE,
                progress = "none")
   list(
