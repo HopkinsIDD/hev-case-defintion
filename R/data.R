@@ -1,8 +1,14 @@
 # Data loading and symptom definitions -------------------------------------
 #
 # All analyses use the three analytic datasets in the repo root. Each row is
-# one patient with acute jaundice (onset <= 30 days before the visit);
-# `infect_bin` is 1 if anti-HEV IgM was detected by ELISA.
+# one patient with acute jaundice (onset <= 30 days before the visit).
+#
+# Outcome contract: every loader returns `infect_bin` (0/1) as the only
+# laboratory column, so all other columns can safely be used as predictors.
+#   - Adults, South Sudan: the RDS holds `baseline_igm_result` and
+#     `baseline_pcr_result`; `load_ssd(outcome = )` picks one (IgM by default,
+#     PCR for the sensitivity analysis) and drops both raw columns.
+#   - Children, South Sudan, and Bangladesh: the RDS holds `infect_bin` (IgM).
 #
 # Symptoms are stored differently in each file:
 #   South Sudan (SSD): factors with levels "No"/"Yes"
@@ -50,19 +56,26 @@ to_binary <- function(dat, symptoms) {
   dat %>% mutate(across(all_of(symptoms), ~ as.integer(as.character(.) %in% c("Yes", "1"))))
 }
 
+# Column holding each reference test in the adult South Sudan RDS
+SSD_OUTCOMES <- c(igm = "baseline_igm_result", pcr = "baseline_pcr_result")
+
 #' Load South Sudan data (patients >= 14 years, or < 14 with `children = TRUE`).
-load_ssd <- function(children = FALSE, binary = FALSE) {
-  file <- if (children) "dat_ssd_adjusted_children.rds" else "dat_ssd_adjusted.rds"
-  dat <- readRDS(here(file))
+#'
+#' @param outcome reference test defining `infect_bin`: "igm" (anti-HEV IgM by
+#'   ELISA, primary analysis) or "pcr" (HEV RNA, adults only).
+load_ssd <- function(children = FALSE, binary = FALSE, outcome = c("igm", "pcr")) {
+  outcome <- match.arg(outcome)
+  if (children) {
+    if (outcome != "igm") stop("PCR results are only available for patients aged 14 and over")
+    dat <- readRDS(here("dat_ssd_adjusted_children.rds"))
+  } else {
+    dat <- readRDS(here("dat_ssd_adjusted.rds")) %>%
+      mutate(infect_bin = as.numeric(.data[[SSD_OUTCOMES[[outcome]]]])) %>%
+      select(infect_bin, everything(), -all_of(SSD_OUTCOMES))
+  }
+  stopifnot(all(dat$infect_bin %in% c(0, 1)), !any(SSD_OUTCOMES %in% names(dat)))
   if (binary) dat <- to_binary(dat, SSD_SYMPTOMS)
   dat
-}
-
-#' Create a separate dataset for sensitivity analyses in South Sudan data focused on PCR-positive patients only
-make_ssd <- function(data, result_var) {
-  data %>%
-    mutate(infect_bin = as.numeric(.data[[result_var]])) %>%
-    select(-baseline_igm_result, -baseline_pcr_result)
 }
 
 
@@ -73,15 +86,48 @@ load_bd <- function(binary = FALSE) {
   dat
 }
 
+# Existing international case definitions (WHO hepatitis E outbreak toolbox).
+# Every patient has acute jaundice, so each reduces to "any of these symptoms".
+# Malaise is recorded as fatigue (SSD) / drowsiness (BD). Epigastric pain and
+# joint pain were not collected in Bangladesh; right upper quadrant tenderness
+# was not collected in either population.
+INTERNATIONAL_DEFS <- list(
+  ssd = list(
+    MSF = c("fatigue", "epigastric_pain", "nausea", "loss_appetite"),
+    WHO = c("fatigue", "fever"),
+    IMC = c("fatigue", "loss_appetite", "fever", "abdomen_pain", "joint_pains")
+  ),
+  bd = list(
+    MSF = c("drowsy_ever", "nausea_ever", "appetite_ever"),
+    WHO = c("drowsy_ever", "fever_ever"),
+    IMC = c("drowsy_ever", "appetite_ever", "fever_ever", "abdomen_ever")
+  )
+)
+
+#' Add one 0/1 column per international definition (`intl_MSF`, ...), using
+#' the definition as operationalised in that population.
+add_international_flags <- function(dat, defs) {
+  for (nm in names(defs)) dat[[paste0("intl_", nm)]] <- as.integer(rowSums(dat[defs[[nm]]]) >= 1)
+  dat
+}
+
 #' Combined SSD + BD data on shared symptoms (0/1), with post-stratification
 #' weights so each study population contributes 50% regardless of size. Weights
 #' sum to the total number of patients, so weighted 2x2 counts are in patients.
+#' IgM is the reference test in both populations.
+#'
+#' The `intl_*` columns flag the international definitions as evaluated in each
+#' country (Table 4), computed *before* restricting to the shared symptoms, so
+#' they keep epigastric pain (MSF) and joint pain (IMC) for South Sudan.
 load_joint <- function() {
-  ssd <- load_ssd(binary = TRUE) %>%
-    select(infect_bin, all_of(SSD_TO_JOINT)) %>%
+  intl <- paste0("intl_", names(INTERNATIONAL_DEFS$ssd))
+  ssd <- load_ssd(binary = TRUE, outcome = "igm") %>%
+    add_international_flags(INTERNATIONAL_DEFS$ssd) %>%
+    select(infect_bin, all_of(SSD_TO_JOINT), all_of(intl)) %>%
     mutate(dataset = "South Sudan")
   bd <- load_bd(binary = TRUE) %>%
-    select(infect_bin, all_of(JOINT_SYMPTOMS)) %>%
+    add_international_flags(INTERNATIONAL_DEFS$bd) %>%
+    select(infect_bin, all_of(JOINT_SYMPTOMS), all_of(intl)) %>%
     mutate(dataset = "Bangladesh")
   bind_rows(ssd, bd) %>%
     group_by(dataset) %>%

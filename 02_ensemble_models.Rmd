@@ -1,5 +1,5 @@
 ---
-title: "Ensemble models (upper bound on discrimination)"
+title: "Ensemble models (flexible benchmark for discrimination)"
 output: html_document
 params:
   cores: 1
@@ -28,21 +28,24 @@ source(here("R", "ensemble.R"))
 # Results then depend on `cores`, so report it alongside the AUCs.
 if (params$cores > 1) RNGkind("L'Ecuyer-CMRG")
 
-ssd <- load_ssd() %>% select(-all_of(SSD_RARE_SYMPTOMS))
-ssd_pcr <- make_ssd(ssd, "baseline_pcr_result")
-ssd <- make_ssd(ssd, "baseline_igm_result")
+ssd <- load_ssd() %>% select(-all_of(SSD_RARE_SYMPTOMS))                       # IgM
+ssd_pcr <- load_ssd(outcome = "pcr") %>% select(-all_of(SSD_RARE_SYMPTOMS))    # PCR
 ssd_children <- load_ssd(children = TRUE) %>% select(-all_of(SSD_RARE_SYMPTOMS))
 bd <- load_bd()
+
+# AUC direction is fixed (higher prediction = HEV positive): a model that ranks
+# patients backwards must get AUC 0, not 1.
+stopifnot(auc_summary(c(0, 0, 1, 1), c(0.9, 0.8, 0.2, 0.1), "check", boot.n = 10)$auc$auc == 0)
 ```
 
 ## South Sudan
 
 ```{r ssd}
 set.seed(1234)
-ssd_30 <- run_ensembles(ssd, SSD_DEMOGRAPHICS, "South Sudan, <=30 days", params$cores)
-ssd_30_pcr <- run_ensembles(ssd_pcr, SSD_DEMOGRAPHICS, "South Sudan, <=30 days", params$cores)
+ssd_30 <- run_ensembles(ssd, SSD_DEMOGRAPHICS, "South Sudan", "IgM", "<=30 days", params$cores)
+ssd_30_pcr <- run_ensembles(ssd_pcr, SSD_DEMOGRAPHICS, "South Sudan", "PCR", "<=30 days", params$cores)
 ssd_14 <- run_ensembles(filter(ssd, days_since_ajs_baseline <= 14), SSD_DEMOGRAPHICS,
-                        "South Sudan, <=14 days", params$cores)
+                        "South Sudan", "IgM", "<=14 days", params$cores)
 
 ```
 
@@ -50,25 +53,47 @@ ssd_14 <- run_ensembles(filter(ssd, days_since_ajs_baseline <= 14), SSD_DEMOGRAP
 
 ```{r bd}
 set.seed(12345)
-bd_30 <- run_ensembles(bd, BD_DEMOGRAPHICS, "Bangladesh, <=30 days", params$cores)
+bd_30 <- run_ensembles(bd, BD_DEMOGRAPHICS, "Bangladesh", "IgM", "<=30 days", params$cores)
 bd_14 <- run_ensembles(filter(bd, days_since_ajs <= 14), BD_DEMOGRAPHICS,
-                       "Bangladesh, <=14 days", params$cores)
+                       "Bangladesh", "IgM", "<=14 days", params$cores)
 ```
 
 ## Children under 14 (South Sudan)
 
 ```{r children}
 set.seed(1234)
-ssd_kids <- run_ensembles(ssd_children, SSD_DEMOGRAPHICS, "South Sudan children", params$cores)
+ssd_kids <- run_ensembles(ssd_children, SSD_DEMOGRAPHICS, "South Sudan children", "IgM", "<=30 days",
+                          params$cores)
 ```
 
 ## AUCs
 
 ```{r auc}
-aucs <- bind_rows(ssd_30$auc, bd_30$auc, ssd_14$auc, bd_14$auc, ssd_30_pcr$auc, ssd_kids$auc)
+runs <- list(ssd_30, bd_30, ssd_14, bd_14, ssd_30_pcr, ssd_kids)
+aucs <- bind_rows(lapply(runs, `[[`, "auc"))
+key <- do.call(paste, c(aucs[c("population", "reference_test", "time_window", "predictor_set")], sep = "|"))
+stopifnot(!anyDuplicated(key))
 aucs %>% mutate(across(c(auc, lower, upper), ~ round(., 2)))
-# Cache for audit/audit.R, which checks the AUCs quoted in the paper without refitting
+
+# Full-precision cache for audit/audit.R (checks the AUCs quoted in the paper
+# without refitting), the held-out predictions behind every AUC, and run metadata.
+# Regenerate the figures and the manuscript AUCs from this same run.
 write.csv(aucs, here("audit", "ensemble_aucs.csv"), row.names = FALSE)
+write.csv(bind_rows(lapply(runs, `[[`, "pred")), here("audit", "ensemble_predictions.csv"),
+          row.names = FALSE)
+git_commit <- tryCatch(system2("git", c("-C", here(), "rev-parse", "HEAD"), stdout = TRUE),
+                       error = function(e) NA_character_)
+data_md5 <- tools::md5sum(here(c("dat_ssd_adjusted.rds", "dat_ssd_adjusted_children.rds",
+                                 "dat_bd_adjusted.rds")))
+writeLines(c(
+  paste("run_date:", format(Sys.time(), tz = "UTC", usetz = TRUE)),
+  paste("git_commit:", git_commit),
+  paste("seeds: South Sudan 1234, Bangladesh 12345, children 1234"),
+  paste("rng_kind:", paste(RNGkind(), collapse = ", ")),
+  paste("cores:", params$cores),
+  paste("data_md5:", basename(names(data_md5)), unname(data_md5)),
+  "", capture.output(sessionInfo())
+), here("audit", "ensemble_run_info.txt"))
 ```
 
 ## Figures
@@ -78,7 +103,7 @@ write.csv(aucs, here("audit", "ensemble_aucs.csv"), row.names = FALSE)
 plot_grid(plot_roc(ssd_30$roc, "red", "A"), plot_roc(bd_30$roc, "orange", "B"))
 # Figure S2
 plot_grid(plot_roc(ssd_14$roc, "red", "A"), plot_roc(bd_14$roc, "orange", "B"))
-# Figure S3
+# Figure S3 (reference test: PCR)
 plot_roc(ssd_30_pcr$roc, "red")
 # Figure S5
 plot_roc(ssd_kids$roc, "red")

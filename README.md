@@ -53,8 +53,11 @@ rerun notebook 02 to refresh it.
 | `dat_ssd_adjusted_children.rds` | South Sudan, under 14, n = 394 | `"Yes"`/`"No"` factors |
 | `dat_bd_adjusted.rds` | Bangladesh, aged 14 and over, n = 1,625 | `"0"`/`"1"` factors |
 
-All patients had jaundice onset within 30 days; `infect_bin` = anti-HEV IgM detected
-by ELISA. Use `load_ssd(binary = TRUE)` / `load_bd(binary = TRUE)` to get 0/1
+All patients had jaundice onset within 30 days. Every loader returns `infect_bin` as
+the only laboratory column: anti-HEV IgM detected by ELISA by default, or HEV RNA by
+PCR with `load_ssd(outcome = "pcr")` (adult South Sudan only; the adult RDS stores
+`baseline_igm_result` and `baseline_pcr_result`, which the loader drops so they never
+enter a model as predictors). Use `load_ssd(binary = TRUE)` / `load_bd(binary = TRUE)` to get 0/1
 symptom columns. Never compare the raw factors with `== 1`: for the South Sudan
 data that is always `FALSE`.
 
@@ -68,10 +71,18 @@ co-infection results (Table S1), and Bangladesh symptoms on the day of admission
 - **Confidence intervals** for single-population sensitivity, specificity, PPV and NPV
   are Wilson score intervals (`prop.test(correct = FALSE)`).
 - **Alternative case definitions** are selected among informative definitions
-  (sensitivity + specificity > 1) whose sensitivity and specificity both exceed a
-  threshold: 0.6 for South Sudan (both rules), 0.5 for Bangladesh, the combined data,
-  and children "at least two", and 0.4 for children "at least one". The highest
-  specificity is chosen, then the highest sensitivity, then the fewest symptoms.
+  (sensitivity + specificity > 1) whose sensitivity and specificity both exceed the
+  highest threshold on the grid 10%, 20%, ..., 90% that any informative definition
+  reaches (`highest_threshold()` in `R/combos.R`; the threshold used is reported with
+  each selection). The highest specificity is chosen, then the highest sensitivity,
+  then the fewest symptoms.
+- **Ensemble AUCs** use pROC with a fixed direction (higher predicted probability =
+  HEV positive) and a 2,000-sample stratified percentile bootstrap CI; the ROC curves
+  come from the same pROC object. Notebook 02 saves the AUCs keyed by population,
+  reference test, time window and predictor set, the held-out predictions
+  (`audit/ensemble_predictions.csv`) and run metadata (`audit/ensemble_run_info.txt`).
+- **Combined-population comparators** apply each country's international definitions
+  as in Table 4 before pooling (`load_joint()` adds `intl_*` flags).
 - **Combined-population CIs** use a bootstrap stratified by population (1,000
   resamples), so the 50/50 weights stay fixed in every resample.
 
